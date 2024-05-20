@@ -34,7 +34,7 @@ class User(db.Model, UserMixin):
 
 
 class StudyGuide(db.Model, UserMixin):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, unique=True)
     Class = db.Column(db.String(20), nullable=False)
     UnitTopic = db.Column(db.String(20), nullable=False)
     Price = db.Column(db.Integer, nullable=False)
@@ -74,7 +74,7 @@ class LoginForm(FlaskForm):
 
 @app.route('/')
 def home():
-    return render_template('index-app.html')
+    return render_template('index.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -89,10 +89,6 @@ def login():
     return render_template('login.html', form=form)
 
 
-@app.route('/SearchTable')
-def searchTable():
-    return render_template('SearchTable.html')
-
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
@@ -106,9 +102,6 @@ def search():
         print("Search Results: Nothing found")
     return render_template('Search_results.html', results=results)
 
-@app.route('/welcome')
-def market():
-    return render_template('index.html')
 
 @app.route('/logout', methods=['GET', 'POST'])
 @login_required
@@ -116,6 +109,10 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
+
+@app.route
+def contacts():
+    return render_template('contacts.html')
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
