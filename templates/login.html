@@ -11,26 +11,45 @@
 
 <body>
     <nav class="navbar navbar-expand-md fixed-top navbar-shrink py-3 navbar-light" id="mainNav">
-        <div class="container"><a class="navbar-brand d-flex align-items-center" href="/static"><span>ASD4ME</span></a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="/"><span>ASD4ME</span></a>
+            <button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1">
+                <span class="visually-hidden">Toggle navigation</span>
+                <span class="navbar-toggler-icon"></span>
+            </button>
             <div class="collapse navbar-collapse" id="navcol-1">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="/contacts">Contact Us</a></li>
-                </ul><a class="btn btn-primary shadow" role="button" href="/signup">Sign up</a>
-                      <a class="btn btn-primary" role="button" href="/login">Log in</a>
+                </ul>
+                <a class="btn btn-primary shadow" role="button" href="/signup">Sign up</a>
+                <a class="btn btn-primary" role="button" href="/login">Log in</a>
             </div>
         </div>
     </nav>
     <section class="py-4 py-md-5 my-5">
         <div class="container py-md-5">
             <div class="row">
-                <div class="col-md-6 text-center"><img class="img-fluid w-100" src="/static/assets/img/illustrations/login.svg"></div>
+                <div class="col-md-6 text-center">
+                    <img class="img-fluid w-100" src="/static/assets/img/illustrations/login.svg" alt="Login Illustration">
+                </div>
                 <div class="col-md-5 col-xl-4 text-center text-md-start">
-                    <h2 class="display-6 fw-bold mb-5"><span class="underline pb-1"><strong>Login</strong><br></span></h2>
-                    <form method="post" data-bs-theme="light">
-                        <div class="mb-3"><input class="shadow form-control" type="text" name="username" placeholder="Email"></div>
-                        <div class="mb-3"><input class="shadow form-control" type="password" name="password" placeholder="Password"></div>
-                        <div class="mb-5"><button class="btn btn-primary shadow" type="submit">Log in</button></div>
+                    <h2 class="display-6 fw-bold mb-5">
+                        <span class="underline pb-1"><strong>Login</strong></span>
+                    </h2>
+                    <form method="post" action="{{ url_for('login') }}" data-bs-theme="light">
+                        {{ form.hidden_tag() }}
+                        <div class="mb-3">
+                            {{ form.username.label(class="form-label") }}
+                            {{ form.username(class="shadow-sm form-control") }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.password.label(class="form-label") }}
+                            {{ form.password(class="shadow-sm form-control") }}
+                        </div>
+                        <div class="mb-5">
+                            {{ form.submit(class="btn btn-primary shadow") }}
+                        </div>
                     </form>
                 </div>
             </div>
