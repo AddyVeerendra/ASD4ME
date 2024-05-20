@@ -89,7 +89,9 @@ def login():
     return render_template('login.html', form=form)
 
 
-
+@app.route('/market')
+def market():
+    return render_template('market.html')
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     q = request.args.get('q')
@@ -110,7 +112,7 @@ def logout():
     return redirect(url_for('login'))
 
 
-@app.route
+@app.route('/contacts')
 def contacts():
     return render_template('contacts.html')
 
