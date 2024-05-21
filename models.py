@@ -13,3 +13,10 @@ class StudyGuide(db.Model):
     UnitTopic = db.Column(db.String(20), nullable=False)
     Price = db.Column(db.Integer, nullable=False)
     Creator = db.Column(db.String(20), nullable=False)
+
+class PendingStudyGuide(db.Model):
+    id = db.Column(db.Integer, primary_key=True, unique=True)
+    Class = db.Column(db.String(20), nullable=False)
+    UnitTopic = db.Column(db.String(20), nullable=False)
+    Price = db.Column(db.Integer, nullable=False)
+    Creator = db.Column(db.String(20), nullable=False)
