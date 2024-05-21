@@ -5,13 +5,18 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>Market - ASD4ME</title>
-    <link rel="stylesheet" href="/static/assets/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/assets/css/styles.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/styles.min.css') }}">
 </head>
 
 <body>
     <nav class="navbar navbar-expand-md fixed-top navbar-shrink py-3 navbar-light" id="mainNav">
-        <div class="container"><a class="navbar-brand d-flex align-items-center" href="/"><span>ASD4ME</span></a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="/market"><span>ASD4ME</span></a>
+            <button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1">
+                <span class="visually-hidden">Toggle navigation</span>
+                <span class="navbar-toggler-icon"></span>
+            </button>
             <div class="collapse navbar-collapse" id="navcol-1">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item"><a class="nav-link" href="/">Search</a></li>
@@ -26,18 +31,35 @@
             <div class="row gy-4 gy-md-0">
                 <div class="col-md-6 text-center text-md-start d-flex d-sm-flex d-md-flex justify-content-center align-items-center justify-content-md-start align-items-md-center justify-content-xl-center">
                     <div style="max-width: 350px;">
-                        <h1 class="display-6 fw-bold mb-4">We're ready to study,&nbsp;<span class="underline">are you?</span></h1>
-                        <p class="my-4">Search for your study guides, or share your own!</p><a class="btn btn-primary btn-lg me-2" role="button" href="#">Search!</a><a class="btn btn-light btn-lg" role="button" href="#">Share!</a>
+                        <h1 class="display-6 fw-bold mb-4">We're ready to study, <span class="underline">{{ user.username }}</span>!</h1>
+                        <p class="my-4">Wallet Balance: ${{ user.wallet }}</p>
+                        <a class="btn btn-primary btn-lg me-2" role="button" href="#">Search!</a>
+                        <a class="btn btn-light btn-lg" role="button" href="#">Share!</a>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div><img class="rounded img-fluid w-100 fit-cover" style="min-height: 300px;" src="/static/assets/img/illustrations/ranking.svg"></div>
+                    <div>
+                        <img class="rounded img-fluid w-100 fit-cover" style="min-height: 300px;" src="{{ url_for('static', filename='assets/img/illustrations/ranking.svg') }}">
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-5">
+                <div class="col-12">
+                    <h2 class="fw-bold mb-4">Available Study Guides</h2>
+                    <ul class="list-group">
+                        {% for item in items %}
+                            <li class="list-group-item">
+                                <strong>{{ item.Class }}</strong> - {{ item.UnitTopic }}: ${{ item.Price }}<br>
+                                <small>Created by: {{ item.Creator }}</small>
+                            </li>
+                        {% endfor %}
+                    </ul>
                 </div>
             </div>
         </div>
     </section>
-    <script src="/static/assets/bootstrap/js/bootstrap.min.js"></script>
-    <script src="/static/assets/js/script.min.js"></script>
+    <script src="{{ url_for('static', filename='assets/bootstrap/js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/script.min.js') }}"></script>
 </body>
 
 </html>
