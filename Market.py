@@ -12,7 +12,10 @@ def market_home():
     items = StudyGuide.query.all()
     return render_template('market.html', user=user, items=items)
 
-
+@market_bp.route('/search')
+@login_required
+def search_home():
+    return render_template('Searchbar.html', user=current_user)
 
 # Below commented lines need to be added and edited afterwards
 """
