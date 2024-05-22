@@ -1,18 +1,22 @@
 from flask import Flask, render_template, url_for, redirect, request, flash
 from flask_login import login_user, login_required, logout_user, current_user
+from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
 import os
-from extensions import db, bcrypt, login_manager
-from models import User, StudyGuide  # Import the models from models.py
+from extensions import db, bcrypt, login_manager, migrate
+from models import User, StudyGuide, PendingStudyGuide
 from Market import market_bp  # Import the blueprint
+from flask_migrate import Migrate
 
 file_path = os.path.abspath(os.getcwd()) + "/Database.db"
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + file_path
 app.config['SECRET_KEY'] = 'Study4Money'
+db.init_app(app)
+migrate.init_app(app, db)
 
 # Initialize extensions
 db.init_app(app)

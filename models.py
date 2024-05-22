@@ -8,15 +8,17 @@ class User(db.Model, UserMixin):
     wallet = db.Column(db.Integer, nullable=False, default=0)
 
 class StudyGuide(db.Model):
-    id = db.Column(db.Integer, primary_key=True, unique=True)
+    id = db.Column(db.Integer,primary_key=True)
     Class = db.Column(db.String(20), nullable=False)
     UnitTopic = db.Column(db.String(20), nullable=False)
     Price = db.Column(db.Integer, nullable=False)
     Creator = db.Column(db.String(20), nullable=False)
+    Link = db.Column(db.String(100), nullable=False)
 
 class PendingStudyGuide(db.Model):
-    id = db.Column(db.Integer, primary_key=True, unique=True)
+    id = db.Column(db.Integer,primary_key=True)
     Class = db.Column(db.String(20), nullable=False)
     UnitTopic = db.Column(db.String(20), nullable=False)
     Price = db.Column(db.Integer, nullable=False)
     Creator = db.Column(db.String(20), nullable=False)
+    Link = db.Column(db.String(100), nullable=False)
