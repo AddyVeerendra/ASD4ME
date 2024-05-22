@@ -1,4 +1,3 @@
-<!-- templates/share.html -->
 <!DOCTYPE html>
 <html data-bs-theme="light" lang="en">
 
@@ -12,12 +11,18 @@
 
 <body>
     <nav class="navbar navbar-expand-md fixed-top navbar-shrink py-3 navbar-light" id="mainNav">
-        <div class="container"><a class="navbar-brand d-flex align-items-center" href="/market"><span>ASD4ME</span></a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="/market"><span>ASD4ME</span></a>
+            <button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1">
+                <span class="visually-hidden">Toggle navigation</span>
+                <span class="navbar-toggler-icon"></span>
+            </button>
             <div class="collapse navbar-collapse" id="navcol-1">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item"><a class="nav-link" href="/market/search">Search</a></li>
                     <li class="nav-item"><a class="nav-link active" href="/market/share">Share</a></li>
-                </ul><a class="btn btn-primary shadow" role="button" href="/market/account">Account</a>
+                </ul>
+                <a class="btn btn-primary shadow" role="button" href="/market/account">Account</a>
             </div>
         </div>
     </nav>
@@ -33,12 +38,30 @@
                 <div class="col-md-6">
                     <div>
                         <form class="p-3 p-xl-4" method="post" action="{{ url_for('market_bp.share') }}">
-                            <div class="mb-3"><input class="shadow form-control" type="text" name="class" placeholder="Class" required></div>
-                            <div class="mb-3"><input class="shadow form-control" type="text" name="unit_topic" placeholder="Unit Topic" required></div>
-                            <div class="mb-3"><input class="shadow form-control" type="number" name="price" placeholder="Price" required></div>
-                            <div class="mb-3"><input class="shadow form-control" type="text" name="creator" value="{{ current_user.username }}" readonly></div>
-                            <div class="mb-3"><input class="shadow form-control" type="text" name="file link" placeholder="File link" required></div>
-                            <div><button class="btn btn-primary shadow d-block w-100" type="submit">Submit</button></div>
+                            {{ form.hidden_tag() }}
+                            <div class="mb-3">
+                                {{ form.Class.label(class_='form-label') }}
+                                {{ form.Class(class_='shadow form-control', placeholder='Class') }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.UnitTopic.label(class_='form-label') }}
+                                {{ form.UnitTopic(class_='shadow form-control', placeholder='Unit Topic') }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.Price.label(class_='form-label') }}
+                                {{ form.Price(class_='shadow form-control', placeholder='Price') }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.Creator.label(class_='form-label') }}
+                                {{ form.Creator(class_='shadow form-control', readonly=True, value=current_user.username) }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.Link.label(class_='form-label') }}
+                                {{ form.Link(class_='shadow form-control', placeholder='File link') }}
+                            </div>
+                            <div>
+                                {{ form.submit(class_='btn btn-primary shadow d-block w-100') }}
+                            </div>
                         </form>
                     </div>
                 </div>

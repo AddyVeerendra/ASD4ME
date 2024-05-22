@@ -8,6 +8,7 @@ import os
 from extensions import db, bcrypt, login_manager, migrate
 from models import User, StudyGuide, PendingStudyGuide
 from Market import market_bp  # Import the blueprint
+from flask_wtf import CSRFProtect
 from flask_migrate import Migrate
 
 file_path = os.path.abspath(os.getcwd()) + "/Database.db"
@@ -17,6 +18,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + file_path
 app.config['SECRET_KEY'] = 'Study4Money'
 db.init_app(app)
 migrate.init_app(app, db)
+csrf = CSRFProtect(app)
+
+from flask_wtf import CSRFProtect
 
 # Initialize extensions
 bcrypt.init_app(app)

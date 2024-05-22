@@ -3,18 +3,23 @@ from flask_login import login_required, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import InputRequired, Length
+import logging
+from wtforms.validators import DataRequired
+
 
 from extensions import db
 from models import StudyGuide, PendingStudyGuide  # Import the models from models.py
 
+logging.basicConfig(level=logging.DEBUG)
+
 market_bp = Blueprint('market_bp', __name__)
 
 class ShareForm(FlaskForm):
-    Class = StringField(validators=[InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Class"})
-    UnitTopic = StringField(validators=[InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "UnitTopic"})
-    Price = StringField(validators=[InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Price"})
-    Creator = StringField(validators=[InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Creator"})
-    Link = StringField(validators=[InputRequired(), Length(min=10, max=10000000)], render_kw={"placeholder": "Link"})
+    Class = StringField(validators=[InputRequired(), DataRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Class"})
+    UnitTopic = StringField(validators=[InputRequired(), DataRequired(), Length(min=8, max=20)], render_kw={"placeholder": "UnitTopic"})
+    Price = StringField(validators=[InputRequired(), DataRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Price"})
+    Creator = StringField(validators=[InputRequired(), DataRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Creator"})
+    Link = StringField(validators=[InputRequired(), DataRequired(),Length(min=10, max=10000000)], render_kw={"placeholder": "Link"})
     submit = SubmitField('Sign Up')
 
 @market_bp.route('/')
@@ -29,21 +34,30 @@ def market_home():
 def search_home():
     return render_template('Searchbar.html', user=current_user)
 
-@market_bp.route('/share', methods=['GET','POST'])
+
+@market_bp.route('/share', methods=['GET', 'POST'])
 @login_required
 def share():
     form = ShareForm()
     if form.validate_on_submit():
-        new_item = PendingStudyGuide(Class=form.Class.data, UnitTopic=form.UnitTopic.data, Price=form.Price.data, Creator=form.Creator.data, Link = form.Link.data)
-        db.session.add(new_item)
-        db.session.commit()
-        return redirect(url_for('success'))
-    return render_template('share.html', user=current_user)
+        # Your logic for processing the form submission
+        flash('Your study guide has been shared successfully!', 'success')
+        return redirect(url_for('market_bp.market'))  # Adjust redirection as needed
+    else:
+        # Log the validation errors if needed
+        app.logger.debug(f'Form validation failed: {form.errors}')
+
+    return render_template('share.html', form=form, user=current_user)
+
 
 @market_bp.route('/account', methods=['GET','POST'])
 @login_required
 def account_home():
     return render_template('Account.html', user=current_user)
+
+@market_bp.route('/success')
+def success():
+    return "Successfully shared the study guide!"
 
 def accept(id):
     if not current_user.is_admin:
