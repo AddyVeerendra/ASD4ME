@@ -1,12 +1,12 @@
-from flask import Blueprint, render_template, redirect, url_for, flash
+from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, IntegerField
 from wtforms.validators import InputRequired, Length, NumberRange
 import logging
-from config import Config
 from wtforms.validators import DataRequired
 from extensions import admin_only
+from flask import render_template
 
 
 from extensions import db
@@ -23,6 +23,9 @@ class ShareForm(FlaskForm):
     Creator = StringField(validators=[DataRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Creator"})
     Link = StringField(validators=[InputRequired(), DataRequired(), Length(min=10, max=10000000)], render_kw={"placeholder": "Link"})
     submit = SubmitField('Sign Up')
+
+class AdminForm(FlaskForm):
+    submit = SubmitField('Submit')
 
 @market_bp.route('/')
 @login_required
@@ -75,52 +78,24 @@ def success():
 
 @market_bp.route('/admin', methods=['GET'])
 @login_required
-def admin_page():
+def admin_home():
     if not current_user.is_admin:
         flash('You do not have access to this page.', 'danger')
         return redirect(url_for('market_bp.market_home'))
 
+    form = AdminForm()
+
+    if request.method == 'POST' and form.validate_on_submit():
+        if 'approve' in request.form:
+            # Logic for approving a guide
+            flash('Guide approved successfully!', 'success')
+        elif 'reject' in request.form:
+            # Logic for rejecting a guide
+            flash('Guide rejected successfully!', 'danger')
+        return redirect(url_for('market_bp.admin_home'))
+
     pending_guides = PendingStudyGuide.query.all()
-    return render_template('admin.html', pending_guides=pending_guides, user=current_user)
-
-@market_bp.route('/approve/<int:id>', methods=['POST'])
-@login_required
-@admin_only
-def approve_guide(id):
-    if not current_user.is_admin:
-        flash('You do not have access to this action.', 'danger')
-        return redirect(url_for('market_bp.market_home'))
-
-    pending_guide = PendingStudyGuide.query.get_or_404(id)
-    new_guide = StudyGuide(
-        Class=pending_guide.Class,
-        UnitTopic=pending_guide.UnitTopic,
-        Price=pending_guide.Price,
-        Creator=pending_guide.Creator,
-        Link=pending_guide.Link
-    )
-    db.session.add(new_guide)
-    db.session.delete(pending_guide)
-    db.session.commit()
-
-    flash('Study guide approved and added to the market.', 'success')
-    return redirect(url_for('market_bp.admin'))
-
-@market_bp.route('/reject/<int:id>', methods=['POST'])
-@login_required
-@admin_only
-def reject_guide(id):
-    if not current_user.is_admin:
-        flash('You do not have access to this action.', 'danger')
-        return redirect(url_for('market_bp.market_home'))
-
-    pending_guide = PendingStudyGuide.query.get_or_404(id)
-    db.session.delete(pending_guide)
-    db.session.commit()
-
-    flash('Study guide rejected and removed from the pending list.', 'success')
-    return redirect(url_for('market_bp.admin'))
-
+    return render_template('admin.html', pending_guides=pending_guides, user=current_user, form=form)
 
 # Below commented lines need to be added and edited afterwards
 """

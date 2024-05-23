@@ -6,6 +6,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(20), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
     wallet = db.Column(db.Integer, nullable=False, default=0)
+    is_admin = db.Column(db.Boolean, default=False)
 
 class StudyGuide(db.Model):
     id = db.Column(db.Integer,primary_key=True)
