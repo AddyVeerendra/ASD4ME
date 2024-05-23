@@ -1,3 +1,4 @@
+<!-- templates/share.html -->
 <!DOCTYPE html>
 <html data-bs-theme="light" lang="en">
 
@@ -14,8 +15,7 @@
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="/market"><span>ASD4ME</span></a>
             <button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1">
-                <span class="visually-hidden">Toggle navigation</span>
-                <span class="navbar-toggler-icon"></span>
+                <span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navcol-1">
                 <ul class="navbar-nav mx-auto">
@@ -30,7 +30,7 @@
         <div class="container py-5">
             <div class="row">
                 <div class="col-md-8 col-xl-6 text-center mx-auto">
-                    <h2 class="display-6 fw-bold mb-4">Ready to&nbsp;<span class="underline">share</span>?</h2>
+                    <h2 class="display-6 fw-bold mb-4">Ready to <span class="underline">share</span>?</h2>
                     <p class="text-muted">Enter the details below to share your study guide</p>
                 </div>
             </div>
@@ -41,23 +41,23 @@
                             {{ form.hidden_tag() }}
                             <div class="mb-3">
                                 {{ form.Class.label(class_='form-label') }}
-                                {{ form.Class(class_='shadow form-control', placeholder='Class') }}
+                                {{ form.Class(class_='form-control') }}
                             </div>
                             <div class="mb-3">
                                 {{ form.UnitTopic.label(class_='form-label') }}
-                                {{ form.UnitTopic(class_='shadow form-control', placeholder='Unit Topic') }}
+                                {{ form.UnitTopic(class_='form-control') }}
                             </div>
                             <div class="mb-3">
                                 {{ form.Price.label(class_='form-label') }}
-                                {{ form.Price(class_='shadow form-control', placeholder='Price') }}
+                                {{ form.Price(class_='form-control') }}
                             </div>
                             <div class="mb-3">
                                 {{ form.Creator.label(class_='form-label') }}
-                                {{ form.Creator(class_='shadow form-control', readonly=True, value=current_user.username) }}
+                                {{ form.Creator(class_='form-control', readonly=True) }}
                             </div>
                             <div class="mb-3">
                                 {{ form.Link.label(class_='form-label') }}
-                                {{ form.Link(class_='shadow form-control', placeholder='File link') }}
+                                {{ form.Link(class_='form-control') }}
                             </div>
                             <div>
                                 {{ form.submit(class_='btn btn-primary shadow d-block w-100') }}
