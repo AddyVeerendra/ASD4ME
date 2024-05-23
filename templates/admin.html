@@ -1,0 +1,51 @@
+<!-- templates/admin.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Approve or Reject Study Guides</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='/static/assets/bootstrap/css/bootstrap.min.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Pending Study Guides</h1>
+        {% if pending_guides %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Class</th>
+                        <th>Unit Topic</th>
+                        <th>Price</th>
+                        <th>Creator</th>
+                        <th>Link</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for guide in pending_guides %}
+                        <tr>
+                            <td>{{ guide.Class }}</td>
+                            <td>{{ guide.UnitTopic }}</td>
+                            <td>{{ guide.Price }}</td>
+                            <td>{{ guide.Creator }}</td>
+                            <td><a href="{{ guide.Link }}" target="_blank">View</a></td>
+                            <td>
+                                <form action="{{ url_for('market_bp.approve_guide', id=guide.id) }}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-success">Approve</button>
+                                </form>
+                                <form action="{{ url_for('market_bp.reject_guide', id=guide.id) }}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger">Reject</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No pending study guides.</p>
+        {% endif %}
+    </div>
+    <script src="{{ url_for('static', filename='/static/assets/bootstrap/js/bootstrap.min.js') }}"></script>
+</body>
+</html>

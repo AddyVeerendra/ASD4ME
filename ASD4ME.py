@@ -1,15 +1,16 @@
-from flask import Flask, render_template, url_for, redirect, request, flash
-from flask_login import login_user, login_required, logout_user, current_user
-from flask_sqlalchemy import SQLAlchemy
+import os
+
+from config import Config
+from flask import Flask, render_template, url_for, redirect, flash
+from flask_login import login_user, login_required, logout_user
+from flask_wtf import CSRFProtect
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
-import os
-from extensions import db, bcrypt, login_manager, migrate
-from models import User, StudyGuide, PendingStudyGuide
+
 from Market import market_bp  # Import the blueprint
-from flask_wtf import CSRFProtect
-from flask_migrate import Migrate
+from extensions import db, bcrypt, login_manager, migrate
+from models import User
 
 file_path = os.path.abspath(os.getcwd()) + "/Database.db"
 
@@ -19,8 +20,6 @@ app.config['SECRET_KEY'] = 'Study4Money'
 db.init_app(app)
 migrate.init_app(app, db)
 csrf = CSRFProtect(app)
-
-from flask_wtf import CSRFProtect
 
 # Initialize extensions
 bcrypt.init_app(app)
