@@ -7,48 +7,39 @@
     <!-- Navigation bar and other content -->
 
     <section class="py-5 mt-5">
-        <!-- Admin section content -->
         <div class="container py-5">
-            <!-- Container content -->
             <div class="row">
-                <!-- Row content -->
                 <div class="col-md-8 col-xl-6 text-center mx-auto">
-                    <!-- Column content -->
                     <h2 class="display-6 fw-bold mb-4">Pending Study Guides</h2>
-                    <!-- Header for pending study guides -->
                     {% if pending_guides %}
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>Title</th>
-                                <th>Author</th>
+                                <th scope="col">Title</th>
+                                <th scope="col">Author</th>
+                                <th scope="col">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for guide in pending_guides %}
-                                <tr>
-                                    <td>{{ guide.title }}</td>
-                                    <td>{{ guide.author }}</td>
-                                </tr>
+                            <tr>
+                                <td>{{ guide.Class }}</td>
+                                <td>{{ guide.Creator }}</td>
+                                <td>
+                                    <form method="post">
+                                        {{ form.csrf_token }}
+                                        <input type="hidden" name="guide_id" value="{{ guide.id }}">
+                                        <button class="btn btn-primary" type="submit" name="approve">Approve</button>
+                                        <button class="btn btn-danger" type="submit" name="reject">Reject</button>
+                                    </form>
+                                </td>
+                            </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                     {% else %}
-                        <p>No pending guides found.</p>
+                    <p>No pending study guides.</p>
                     {% endif %}
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-8 col-xl-6 text-center mx-auto">
-                    <h2 class="display-6 fw-bold mb-4">Actions</h2>
-                    <!-- Header for actions -->
-                    <form method="post">
-                        <!-- Form for actions -->
-                        {{ form.hidden_tag() }}
-                        <!-- Include hidden fields -->
-                        <button class="btn btn-primary" type="submit" name="approve">Approve</button>
-                        <button class="btn btn-danger" type="submit" name="reject">Reject</button>
-                    </form>
                 </div>
             </div>
         </div>

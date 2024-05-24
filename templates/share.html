@@ -1,79 +1,57 @@
-<!-- templates/share.html -->
+<!-- templates/admin.html -->
 <!DOCTYPE html>
-<html data-bs-theme="light" lang="en">
+<html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Share - ASD4ME</title>
-    <link rel="stylesheet" href="/static/assets/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/assets/css/styles.min.css">
+    <!-- Head content -->
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-md fixed-top navbar-shrink py-3 navbar-light" id="mainNav">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="/market"><span>ASD4ME</span></a>
-            <button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1">
-                <span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navcol-1">
-                <ul class="navbar-nav mx-auto">
-                    <li class="nav-item"><a class="nav-link" href="/market/search">Search</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="/market/share">Share</a></li>
-                    {% if current_user.is_admin %}
-                      <li class="nav-item"><a class="nav-link" href="{{ url_for('market_bp.admin_page') }}">Admin</a></li>
-                    {% endif %}
-                </ul>
-                <a class="btn btn-primary shadow" role="button" href="/market/account">Account</a>
-            </div>
-        </div>
-    </nav>
+    <!-- Navigation bar and other content -->
+
     <section class="py-5 mt-5">
+        <!-- Admin section content -->
         <div class="container py-5">
+            <!-- Container content -->
             <div class="row">
+                <!-- Row content -->
                 <div class="col-md-8 col-xl-6 text-center mx-auto">
-                    <h2 class="display-6 fw-bold mb-4">Ready to <span class="underline">share</span>?</h2>
-                    <p class="text-muted">Enter the details below to share your study guide</p>
-                </div>
-            </div>
-            <div class="row d-flex justify-content-center">
-                <div class="col-md-6">
-                    <div>
-                        <form class="p-3 p-xl-4" method="post" action="{{ url_for('market_bp.share') }}">
-                            {{ form.hidden_tag() }}
-                            <div class="mb-3">
-                                {{ form.Class.label(class_='form-label') }}
-                                {{ form.Class(class_='form-control') }}
-                            </div>
-                            <div class="mb-3">
-                                {{ form.UnitTopic.label(class_='form-label') }}
-                                {{ form.UnitTopic(class_='form-control') }}
-                            </div>
-                            <div class="mb-3">
-                                {{ form.Price.label(class_='form-label') }}
-                                {{ form.Price(class_='form-control') }}
-                            </div>
-                            <div class="mb-3">
-                                {{ form.Creator.label(class_='form-label') }}
-                                {{ form.Creator(class_='form-control', readonly=True) }}
-                            </div>
-                            <div class="mb-3">
-                                {{ form.Link.label(class_='form-label') }}
-                                {{ form.Link(class_='form-control') }}
-                            </div>
-                            <div>
-                                {{ form.submit(class_='btn btn-primary shadow d-block w-100') }}
-                            </div>
-                        </form>
-                    </div>
+                    <!-- Column content -->
+                    <h2 class="display-6 fw-bold mb-4">Pending Study Guides</h2>
+                    <!-- Table displaying pending study guides -->
+                    {% if pending_guides %}
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Title</th>
+                                <th scope="col">Author</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for guide in pending_guides %}
+                            <tr>
+                                <td>{{ guide.title }}</td>
+                                <td>{{ guide.author }}</td>
+                                <td>
+                                    <form method="post">
+                                        {{ form.csrf_token }}
+                                        <input type="hidden" name="guide_id" value="{{ guide.id }}">
+                                        <button class="btn btn-primary" type="submit" name="approve">Approve</button>
+                                        <button class="btn btn-danger" type="submit" name="reject">Reject</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p>No pending study guides.</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </section>
-    <footer></footer>
-    <script src="/static/assets/bootstrap/js/bootstrap.min.js"></script>
-    <script src="/static/assets/js/script.min.js"></script>
 </body>
 
 </html>

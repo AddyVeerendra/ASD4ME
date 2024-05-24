@@ -1,6 +1,5 @@
 import os
 
-from config import Config
 from flask import Flask, render_template, url_for, redirect, flash
 from flask_login import login_user, login_required, logout_user
 from flask_wtf import CSRFProtect

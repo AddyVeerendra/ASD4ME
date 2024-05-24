@@ -5,7 +5,6 @@ from wtforms import StringField, SubmitField, IntegerField
 from wtforms.validators import InputRequired, Length, NumberRange
 import logging
 from wtforms.validators import DataRequired
-from extensions import admin_only
 from flask import render_template
 
 
