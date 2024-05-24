@@ -75,22 +75,34 @@ def account_home():
 def success():
     return "Successfully shared the study guide!"
 
-@market_bp.route('/admin', methods=['GET'])
+@market_bp.route('/admin', methods=['GET', 'POST'])
 @login_required
 def admin_home():
     if not current_user.is_admin:
         flash('You do not have access to this page.', 'danger')
         return redirect(url_for('market_bp.market_home'))
 
+    action = request.form.get('action')
     form = AdminForm()
-
     if request.method == 'POST' and form.validate_on_submit():
-        if 'approve' in request.form:
+        if action == 'approve':
             # Logic for approving a guide
+            approved_guide = PendingStudyGuide.query.get(request.form['approve'])
+            new_guide = StudyGuide(
+                Class=approved_guide.Class,
+                UnitTopic=approved_guide.UnitTopic,
+                Price=approved_guide.Price,
+                Creator=approved_guide.Creator,
+                Link=approved_guide.Link
+            )
+            db.session.add(new_guide)
+            db.session.delete(approved_guide)
+            db.session.commit()
             flash('Guide approved successfully!', 'success')
-        elif 'reject' in request.form:
-            # Logic for rejecting a guide
-            flash('Guide rejected successfully!', 'danger')
+        elif action == 'reject':
+            db.session.delete(PendingStudyGuide.query.get(request.form['reject']))
+            db.session.commit()
+            flash('Guide rejected successfully!', 'success')
         return redirect(url_for('market_bp.admin_home'))
 
     pending_guides = PendingStudyGuide.query.all()
