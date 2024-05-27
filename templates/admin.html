@@ -30,11 +30,11 @@
                                 <td>{{ guide.Price }}</td>
                                 <td><a href="{{ guide.Link }}">Link</a></td>
                                 <td>
-                                    <form method="post", action="{{ url_for('market_bp.admin_home')}}">
+                                    <form method="post" action="{{ url_for('market_bp.admin_home') }}">
                                         {{ form.csrf_token }}
                                         <input type="hidden" name="guide_id" value="{{ guide.id }}">
-                                        <button class="btn btn-primary" type="submit" name="approve">Approve</button>
-                                        <button class="btn btn-danger" type="submit" name="reject">Reject</button>
+                                        <button class="btn btn-primary" type="submit" name="action" value="approve">Approve</button>
+                                        <button class="btn btn-danger" type="submit" name="action" value="reject">Reject</button>
                                     </form>
                                 </td>
                             </tr>

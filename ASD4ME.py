@@ -7,7 +7,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
 
-from Market import market_bp  # Import the blueprint
+from Market import market_bp
 from extensions import db, bcrypt, login_manager, migrate
 from models import User
 
