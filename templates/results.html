@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search - ASD4ME</title>
+    <title>Search Results - ASD4ME</title>
     <link rel="stylesheet" href="/static/assets/bootstrap/css/bootstrap.min.css">
 </head>
 
@@ -29,23 +29,25 @@
         <div class="container py-5">
             <div class="row">
                 <div class="col-md-8 col-xl-6 text-center mx-auto">
-                    <h2 class="display-6 fw-bold mb-4">Looking for a&nbsp;<span class="underline">study guide?</span></h2>
-                    <p class="text-muted">Search for a class, subject, or username here</p>
+                    <h2 class="display-6 fw-bold mb-4">Search Results for "{{ query }}"</h2>
                 </div>
             </div>
             <div class="row d-flex justify-content-center">
-                <div class="col-md-6">
-                    <div>
-                        <form class="p-3 p-xl-4" method="post" action="{{ url_for('market_bp.search') }}">
-                            {{ form.hidden_tag() }}
-                            <div class="mb-3">
-                                {{ form.query(class="shadow form-control", placeholder="Search") }}
-                            </div>
-                            <div>
-                                {{ form.submit(class="btn btn-primary shadow d-block w-100") }}
-                            </div>
-                        </form>
-                    </div>
+                <div class="col-md-8">
+                    {% if results %}
+                        <ul class="list-group">
+                            {% for result in results %}
+                                <li class="list-group-item">
+                                    <h5>{{ result.Class }}</h5>
+                                    <p>{{ result.UnitTopic }}</p>
+                                    <p><strong>Created by:</strong> {{ result.Creator }}</p>
+                                    <p><strong>Price:</strong> ${{ result.Price }}</p>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted">No results found for your search query.</p>
+                    {% endif %}
                 </div>
             </div>
         </div>

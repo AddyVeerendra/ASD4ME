@@ -31,6 +31,9 @@ class ShareForm(FlaskForm):
 class AdminForm(FlaskForm):
     submit = SubmitField('Submit')
 
+class SearchForm(FlaskForm):
+    query = StringField('Query', validators=[DataRequired()])
+    submit = SubmitField('Search')
 
 @market_bp.route('/')
 @login_required
@@ -40,10 +43,7 @@ def market_home():
     return render_template('market.html', user=user, items=items)
 
 
-@market_bp.route('/search', methods=['GET', 'POST'])
-@login_required
-def search_home():
-    return render_template('Searchbar.html', user=current_user)
+
 
 
 @market_bp.route('/share', methods=['GET', 'POST'])
@@ -92,44 +92,35 @@ def admin_home():
 
     form = AdminForm()
 
-    if request.method == 'POST':
+    if request.method == 'POST' and form.validate_on_submit():
         action = request.form.get('action')
-        guide_id = request.form.get('guide_id')
-
-        # Debugging logs
-        logging.debug("Form submitted")
-        logging.debug(f"Action: {action}")
-        logging.debug(f"Guide ID: {guide_id}")
-
-        if form.validate_on_submit():
-            guide_id = int(guide_id)
-
-            if action == 'approve':
-                approved_guide = PendingStudyGuide.query.get(guide_id)
-                if approved_guide:
-                    new_guide = StudyGuide(
-                        Class=approved_guide.Class,
-                        UnitTopic=approved_guide.UnitTopic,
-                        Price=approved_guide.Price,
-                        Creator=approved_guide.Creator,
-                        Link=approved_guide.Link
-                    )
-                    db.session.add(new_guide)
-                    db.session.delete(approved_guide)
-                    db.session.commit()
-                    flash('Guide approved successfully!', 'success')
-                else:
-                    flash('Guide not found!', 'danger')
-            elif action == 'reject':
-                rejected_guide = PendingStudyGuide.query.get(guide_id)
-                if rejected_guide:
-                    db.session.delete(rejected_guide)
-                    db.session.commit()
-                    flash('Guide rejected successfully!', 'success')
-                else:
-                    flash('Guide not found!', 'danger')
+        guide_id = int(request.form.get('guide_id'))
+        if action == 'approve':
+            approved_guide = PendingStudyGuide.query.get(guide_id)
+            if approved_guide:
+                new_guide = StudyGuide(
+                    Class=approved_guide.Class,
+                    UnitTopic=approved_guide.UnitTopic,
+                    Price=approved_guide.Price,
+                    Creator=approved_guide.Creator,
+                    Link=approved_guide.Link
+                )
+                db.session.add(new_guide)
+                db.session.delete(approved_guide)
+                db.session.commit()
+                flash('Guide approved successfully!', 'success')
             else:
-                flash('Form validation failed', 'danger')
+                flash('Guide not found!', 'danger')
+        elif action == 'reject':
+            rejected_guide = PendingStudyGuide.query.get(guide_id)
+            if rejected_guide:
+                db.session.delete(rejected_guide)
+                db.session.commit()
+                flash('Guide rejected successfully!', 'success')
+            else:
+                flash('Guide not found!', 'danger')
+        else:
+            flash('Form validation failed', 'danger')
 
         return redirect(url_for('market_bp.admin_home'))
 
@@ -137,15 +128,27 @@ def admin_home():
     return render_template('admin.html', pending_guides=pending_guides, user=current_user, form=form)
 
 
-# Below commented lines need to be added and edited afterwards
-"""
 @market_bp.route('/search', methods=['GET', 'POST'])
 @login_required
 def search():
-    q = request.args.get('q')
-    if q:
-        results = StudyGuide.query.filter(StudyGuide.Class.ilike(f'%{q}%')).all()
+    form = SearchForm()
+    if form.validate_on_submit():
+        query = form.query.data
+        return redirect(url_for('market_bp.results', query=query))
+    return render_template('searchbar.html', form=form, user=current_user)
+
+
+@market_bp.route('/search/results')
+@login_required
+def results():
+    query = request.args.get('query')
+    if query:
+        search = f"%{query}%"
+        results = StudyGuide.query.filter(
+            StudyGuide.Class.ilike(search) |
+            StudyGuide.UnitTopic.ilike(search) |
+            StudyGuide.Creator.ilike(search)
+        ).order_by(StudyGuide.Price).all()
     else:
         results = []
-    return render_template('search_results.html', results=results, user=current_user)
-"""
+    return render_template('results.html', results=results, query=query, user=current_user)
