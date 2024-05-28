@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search - ASD4ME</title>
+    <link rel="stylesheet" href="/static/assets/bootstrap/css/bootstrap.min.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-md fixed-top navbar-shrink py-3 navbar-light" id="mainNav">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="/market"><span>ASD4ME</span></a>
+            <button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1">
+                <span class="visually-hidden">Toggle navigation</span>
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navcol-1">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link active" href="/market/search">Search</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/market/share">Share</a></li>
+                </ul>
+                <a class="btn btn-primary shadow" role="button" href="/market/account">Account</a>
+            </div>
+        </div>
+    </nav>
+    <section class="py-5 mt-5">
+        <div class="container py-5">
+            <div class="row">
+                <div class="col-md-8 col-xl-6 text-center mx-auto">
+                    <h2 class="display-6 fw-bold mb-4">Looking for a&nbsp;<span class="underline">study guide?</span></h2>
+                    <p class="text-muted">Search for a class, subject, or username here</p>
+                </div>
+            </div>
+            <div class="row d-flex justify-content-center">
+                <div class="col-md-6">
+                    <div>
+                        <form class="p-3 p-xl-4" method="post" action="{{ url_for('market_bp.search') }}">
+                            {{ form.hidden_tag() }}
+                            <div class="mb-3">
+                                {{ form.query(class="shadow form-control", placeholder="Search") }}
+                            </div>
+                            <div>
+                                {{ form.submit(class="btn btn-primary shadow d-block w-100") }}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="/static/assets/bootstrap/js/bootstrap.min.js"></script>
+</body>
+
+</html>
