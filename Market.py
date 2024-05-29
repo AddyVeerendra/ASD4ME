@@ -20,7 +20,7 @@ from wtforms.validators import DataRequired
 from flask import render_template
 
 from extensions import db  # Import the database object from extensions.py
-from models import StudyGuide, PendingStudyGuide  # Import the models from models.py
+from models import study_guide, pending_study_guide, Cart, CartItem  # Import the models from models.py
 
 # Used for logging changes in consoles
 logging.basicConfig(level=logging.DEBUG)
@@ -90,7 +90,7 @@ def market_home():
     parts of the website. Also displays all study guides available for purchase.
     """
     user = current_user
-    items = StudyGuide.query.all()
+    items = study_guide.query.all()
     return render_template('market.html', user=user, items=items)
 
 
@@ -107,7 +107,7 @@ def share():
     # Check for form validation
     if form.validate_on_submit():
         # Create a new pending study guide and fill in data using input from forms
-        new_pending_guide = PendingStudyGuide(
+        new_pending_guide = pending_study_guide(
             Class=form.Class.data,
             UnitTopic=form.UnitTopic.data,
             Price=form.Price.data,
@@ -152,9 +152,9 @@ def admin_home():
         # Check if the action is approve
         if action == 'approve':
             # Create a new approved study guide using data from the pending study guide
-            approved_guide = PendingStudyGuide.query.get(guide_id)
+            approved_guide = pending_study_guide.query.get(guide_id)
             if approved_guide:
-                new_guide = StudyGuide(
+                new_guide = study_guide(
                     Class=approved_guide.Class,
                     UnitTopic=approved_guide.UnitTopic,
                     Price=approved_guide.Price,
@@ -169,7 +169,7 @@ def admin_home():
                 db.session.commit()
         elif action == 'reject':
             # Reject a pending study guide
-            rejected_guide = PendingStudyGuide.query.get(guide_id)
+            rejected_guide = pending_study_guide.query.get(guide_id)
             if rejected_guide:
                 db.session.delete(rejected_guide)
                 db.session.commit()
@@ -181,7 +181,7 @@ def admin_home():
 
         return redirect(url_for('market_bp.admin_home'))
 
-    pending_guides = PendingStudyGuide.query.all()
+    pending_guides = pending_study_guide.query.all()
     return render_template('admin.html', pending_guides=pending_guides, user=current_user, form=form)
 
 
@@ -195,23 +195,48 @@ def search():
     if form.validate_on_submit():
         query = form.query.data
         return redirect(url_for('market_bp.results', query=query))
-    return render_template('searchbar.html', form=form, user=current_user)
+    return render_template('Searchbar.html', form=form, user=current_user)
 
 
-@market_bp.route('/search/results')
+@market_bp.route('/results', methods=['GET', 'POST'])
 @login_required
 def results():
-    """
-    Page displaying search results.
-    """
+    form = FlaskForm()  # Create an instance of your form class
+
+    if request.method == 'POST':
+        action = request.form.get('action')
+        if action == 'add_to_cart':
+            study_guide_id = request.form.get('study_guide_id')
+            if study_guide_id:
+                StudyGuide = study_guide.query.get(study_guide_id)
+                if StudyGuide:
+                    if not current_user.cart:
+                        cart = Cart(user_id=current_user.id)
+                        db.session.add(cart)
+                        db.session.commit()
+                    else:
+                        cart = current_user.cart
+                    cart_item = CartItem.query.filter_by(cart_id=cart.id, study_guide_id=study_guide_id).first()
+                    if cart_item:
+                        cart_item.quantity += 1
+                    else:
+                        cart_item = CartItem(cart_id=cart.id, study_guide_id=study_guide_id, quantity=1)
+                        db.session.add(cart_item)
+
+                    db.session.commit()
+                    flash('Item added to cart successfully!', 'success')
+                else:
+                    flash('Study guide not found.', 'danger')
+            else:
+                flash('Invalid request.', 'danger')
+
     query = request.args.get('query')
+    results = []
     if query:
-        search = f"%{query}%"
-        results = StudyGuide.query.filter(
-            StudyGuide.Class.ilike(search) |
-            StudyGuide.UnitTopic.ilike(search) |
-            StudyGuide.Creator.ilike(search)
-        ).order_by(StudyGuide.Price).all()
-    else:
-        results = []
-    return render_template('results.html', results=results, query=query, user=current_user)
+        results = study_guide.query.filter(
+            (study_guide.Class.ilike(f'%{query}%')) |
+            (study_guide.UnitTopic.ilike(f'%{query}%')) |
+            (study_guide.Creator.ilike(f'%{query}%'))
+        ).all()
+
+    return render_template('results.html', query=query, results=results, form=form)

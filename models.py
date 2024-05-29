@@ -9,7 +9,7 @@ class User(db.Model, UserMixin):
     is_admin = db.Column(db.Boolean, default=False, nullable=False)
     cart = db.relationship('Cart', backref='user', lazy=True)
 
-class StudyGuide(db.Model):
+class study_guide(db.Model):
     id = db.Column(db.Integer,primary_key=True)
     Class = db.Column(db.String(20), nullable=False)
     UnitTopic = db.Column(db.String(20), nullable=False)
@@ -17,7 +17,7 @@ class StudyGuide(db.Model):
     Creator = db.Column(db.String(20), nullable=False)
     Link = db.Column(db.String(100), nullable=False)
 
-class PendingStudyGuide(db.Model):
+class pending_study_guide(db.Model):
     id = db.Column(db.Integer,primary_key=True)
     Class = db.Column(db.String(20), nullable=False)
     UnitTopic = db.Column(db.String(20), nullable=False)

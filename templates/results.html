@@ -42,11 +42,16 @@
                                     <p>{{ result.UnitTopic }}</p>
                                     <p><strong>Created by:</strong> {{ result.Creator }}</p>
                                     <p><strong>Price:</strong> ${{ result.Price }}</p>
+                                    <form method="POST" action="{{ url_for('market_bp.results') }}">
+                                        {{ form.hidden_tag() }}
+                                        <input type="hidden" name="study_guide_id" value="{{ result.id }}">
+                                        <button type="submit" name="action" value="add_to_cart" class="btn btn-primary">Add to Cart</button>
+                                    </form>
                                 </li>
                             {% endfor %}
                         </ul>
                     {% else %}
-                        <p class="text-muted">No results found for your search. Please try again with a different search</p>
+                        <p class="text-muted">No results found for your search. Please try again with a different search.</p>
                     {% endif %}
                 </div>
             </div>
