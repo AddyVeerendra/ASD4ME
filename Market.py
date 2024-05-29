@@ -1,3 +1,15 @@
+"""
+Market.py is the main file for the market application. It contains the following functions:
+    - market_home: Home page of the market application. Displays basic user info such as wallet balance, and allows
+    navigation to other parts of the website. Also displays all study guides available for purchase.
+    - share: Page for users to share study guides. Users enter the necessary information to share a study guide in
+    share.html
+    - account_home: User's account page. Displays account info such as wallet balance and cart. Allows users to purchase
+    cart info
+    - admin_home: Admin's home page. Displays pending study guides and allows admin to approve or reject them.
+    - search: Page for users to search study guides.
+    - results: Page displaying search results.
+"""
 from flask import Blueprint, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 from flask_wtf import FlaskForm
@@ -7,43 +19,66 @@ import logging
 from wtforms.validators import DataRequired
 from flask import render_template
 
-from extensions import db
+from extensions import db  # Import the database object from extensions.py
 from models import StudyGuide, PendingStudyGuide  # Import the models from models.py
 
+# Used for logging changes in consoles
 logging.basicConfig(level=logging.DEBUG)
 
 # Blueprint for the market application
 market_bp = Blueprint('market_bp', __name__)
 
+'''
+Things to know:
+@login_required: Checks if the user is logged in. If not, the page does not open.
+FlaskForm: Type of form defined by flask_wtf in imports
+StringField: Field for users to enter text
+SubmitField: Button that receives submit input
+InputRequired: Checks if the field is filled
+Length: Checks if the length of the field is within a certain range
+NumberRange: Checks if the number is within a certain range
+'''
+
 
 class ShareForm(FlaskForm):
     """
-    Form for users to share study guides.
+    Form for users to share study guides. Users enter the class, unit/topic, price, creator, and link to the study guide
+    FlaskForm: Type of form defined by flask_wtf in imports
     """
+    # Class: Class study guide is about
     Class = StringField(validators=[InputRequired(), DataRequired(), Length(min=4, max=100)],
                         render_kw={"placeholder": "Class"})
+    # Unit Topic: Topic study guide is about
     UnitTopic = StringField(validators=[InputRequired(), DataRequired(), Length(min=4, max=100)],
                             render_kw={"placeholder": "UnitTopic"})
+    # Price: Price of study guide
     Price = IntegerField(validators=[InputRequired(), DataRequired(), NumberRange(min=0, max=1000)],
                          render_kw={"placeholder": "Price"})
+    # Creator: Author of the study guide (Field autofilled with username of account)
     Creator = StringField(validators=[DataRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Creator"})
+    # Link: Link to the study guide
     Link = StringField(validators=[InputRequired(), DataRequired(), Length(min=10, max=10000000)],
                        render_kw={"placeholder": "Link"})
+    # Submit: Button that receives submit input
     submit = SubmitField('Sign Up')
 
 
 class AdminForm(FlaskForm):
     """
-    Form for admin to approve or reject study guides.
+    Form for admin to approve or reject study guides. Admins can submit a form to approve or reject a study guide.
+    FlaskForm: Type of form defined by flask_wtf in imports
     """
+    # Submit: Button that receives submit input
     submit = SubmitField('Submit')
 
 
 class SearchForm(FlaskForm):
     """
-    Form for users to search study guides.
+    Form for users to search study guides. Users use a searchbar to search for study guides
     """
+    # query: The string users use to search
     query = StringField('Query', validators=[DataRequired()])
+    # submit: Button that receives submit input
     submit = SubmitField('Search')
 
 
@@ -51,7 +86,8 @@ class SearchForm(FlaskForm):
 @login_required
 def market_home():
     """
-    Home page of the market application. Displays all study guides.
+    Home page of the market application. Displays basic user info such as wallet balance, and allows navigation to other
+    parts of the website. Also displays all study guides available for purchase.
     """
     user = current_user
     items = StudyGuide.query.all()
@@ -62,12 +98,15 @@ def market_home():
 @login_required
 def share():
     """
-    Page for users to share study guides.
+    Page for users to share study guides. Users enter the necessary information to share a study guide in share.html
     """
+    # Initialize form
     form = ShareForm()
+    # Autofill creator field with username of account
     form.Creator.data = current_user.username
+    # Check for form validation
     if form.validate_on_submit():
-        # Create a new pending study guide
+        # Create a new pending study guide and fill in data using input from forms
         new_pending_guide = PendingStudyGuide(
             Class=form.Class.data,
             UnitTopic=form.UnitTopic.data,
@@ -75,16 +114,11 @@ def share():
             Creator=form.Creator.data,
             Link=form.Link.data
         )
-
+        # Add the new pending study guide to the database
         db.session.add(new_pending_guide)
+        # Commit the changes to the study guide
         db.session.commit()
-
-        flash('Your study guide has been shared successfully and is pending approval!', 'success')
-        return redirect(url_for('market_bp.market_home'))
-    else:
-        # Log the validation errors if needed
-        logging.debug(f'Form validation failed: {form.errors}')
-
+    # Render share.html for the users to successfully share
     return render_template('share.html', form=form, user=current_user)
 
 
@@ -92,17 +126,10 @@ def share():
 @login_required
 def account_home():
     """
-    User's account page.
+    User's account page. Displays account info such as wallet balance and cart. Allows users to purchase cart info
     """
+    # Render Account.html for the users to see their account info
     return render_template('Account.html', user=current_user)
-
-
-@market_bp.route('/success')
-def success():
-    """
-    Page displayed after a successful share.
-    """
-    return "Successfully shared the study guide!"
 
 
 @market_bp.route('/admin', methods=['GET', 'POST'])
@@ -111,17 +138,20 @@ def admin_home():
     """
     Admin's home page. Displays pending study guides and allows admin to approve or reject them.
     """
+    # Check if the user is an admin. If not, redirect to the market home page (is_admin is a boolean in user database)
     if not current_user.is_admin:
-        flash('You do not have access to this page.', 'danger')
         return redirect(url_for('market_bp.market_home'))
-
+    # Initialize form
     form = AdminForm()
-
+    # Check for form validation
     if request.method == 'POST' and form.validate_on_submit():
+        # Get the action and guide_id from the form (Found in the hidden input fields in admin.html)
         action = request.form.get('action')
+        # Receive the guide_id from the form
         guide_id = int(request.form.get('guide_id'))
+        # Check if the action is approve
         if action == 'approve':
-            # Approve a pending study guide
+            # Create a new approved study guide using data from the pending study guide
             approved_guide = PendingStudyGuide.query.get(guide_id)
             if approved_guide:
                 new_guide = StudyGuide(
@@ -131,12 +161,12 @@ def admin_home():
                     Creator=approved_guide.Creator,
                     Link=approved_guide.Link
                 )
+                # Add the new study guide to the database
                 db.session.add(new_guide)
+                # Delete the old study guide from the database
                 db.session.delete(approved_guide)
+                # Commit changes to the database
                 db.session.commit()
-                flash('Guide approved successfully!', 'success')
-            else:
-                flash('Guide not found!', 'danger')
         elif action == 'reject':
             # Reject a pending study guide
             rejected_guide = PendingStudyGuide.query.get(guide_id)
