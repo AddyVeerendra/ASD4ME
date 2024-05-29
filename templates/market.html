@@ -2,53 +2,82 @@
 <html data-bs-theme="light" lang="en">
 
 <head>
+    <!-- Meta tags for character encoding, viewport settings, and title -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>Market - ASD4ME</title>
+
+    <!-- Link to Bootstrap CSS file -->
     <link rel="stylesheet" href="{{ url_for('static', filename='assets/bootstrap/css/bootstrap.min.css') }}">
+
+    <!-- Link to custom CSS file -->
     <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/styles.min.css') }}">
 </head>
 
 <body>
+    <!-- Navigation bar with brand, links, and a button -->
     <nav class="navbar navbar-expand-md fixed-top navbar-shrink py-3 navbar-light" id="mainNav">
         <div class="container">
+            <!-- Brand name -->
             <a class="navbar-brand d-flex align-items-center" href="/market"><span>ASD4ME</span></a>
+
+            <!-- Toggle button for mobile view -->
             <button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1">
                 <span class="visually-hidden">Toggle navigation</span>
                 <span class="navbar-toggler-icon"></span>
             </button>
+
+            <!-- Navigation links -->
             <div class="collapse navbar-collapse" id="navcol-1">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item"><a class="nav-link" href="/market/search">Search</a></li>
                     <li class="nav-item"><a class="nav-link" href="/market/share">Share</a></li>
                 </ul>
+
+                <!-- Button to account page -->
                 <a class="btn btn-primary shadow" role="button" href="/market/account">Account</a>
             </div>
         </div>
     </nav>
+
+    <!-- Main content section -->
     <section class="py-5 mt-5">
         <div class="container py-4 py-xl-5">
+            <!-- Row with two columns -->
             <div class="row gy-4 gy-md-0">
+                <!-- Left column with text and buttons -->
                 <div class="col-md-6 text-center text-md-start d-flex d-sm-flex d-md-flex justify-content-center align-items-center justify-content-md-start align-items-md-center justify-content-xl-center">
                     <div style="max-width: 350px;">
+                        <!-- Welcome message with user's name -->
                         <h1 class="display-6 fw-bold mb-4">We're ready to study, <span class="underline">{{ user.username }}</span>!</h1>
+
+                        <!-- User's wallet balance -->
                         <p class="my-4">Wallet Balance: ${{ user.wallet }}</p>
+
+                        <!-- Buttons to search and share study guides -->
                         <a class="btn btn-primary btn-lg me-2" role="button" href="/market/search">Search!</a>
                         <a class="btn btn-light btn-lg" role="button" href="/market/share">Share!</a>
                     </div>
                 </div>
+
+                <!-- Right column with an image -->
                 <div class="col-md-6">
                     <div>
+                        <!-- Image of a ranking -->
                         <img class="rounded img-fluid w-100 fit-cover" style="min-height: 300px;" src="{{ url_for('static', filename='assets/img/illustrations/ranking.svg') }}">
                     </div>
                 </div>
             </div>
+
+            <!-- Row with a list of available study guides -->
             <div class="row mt-5">
                 <div class="col-12">
                     <h2 class="fw-bold mb-4">Available Study Guides</h2>
                     <ul class="list-group">
+                        <!-- Loop through the items and display each one -->
                         {% for item in items %}
                             <li class="list-group-item">
+                                <!-- Study guide details -->
                                 <strong>{{ item.Class }}</strong> - {{ item.UnitTopic }}: ${{ item.Price }}<br>
                                 <small>Created by: {{ item.Creator }}</small>
                             </li>
@@ -58,7 +87,11 @@
             </div>
         </div>
     </section>
+
+    <!-- Link to Bootstrap JavaScript file -->
     <script src="{{ url_for('static', filename='assets/bootstrap/js/bootstrap.min.js') }}"></script>
+
+    <!-- Link to custom JavaScript file -->
     <script src="{{ url_for('static', filename='assets/js/script.min.js') }}"></script>
 </body>
 

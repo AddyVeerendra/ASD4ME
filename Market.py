@@ -12,10 +12,14 @@ from models import StudyGuide, PendingStudyGuide  # Import the models from model
 
 logging.basicConfig(level=logging.DEBUG)
 
+# Blueprint for the market application
 market_bp = Blueprint('market_bp', __name__)
 
 
 class ShareForm(FlaskForm):
+    """
+    Form for users to share study guides.
+    """
     Class = StringField(validators=[InputRequired(), DataRequired(), Length(min=4, max=100)],
                         render_kw={"placeholder": "Class"})
     UnitTopic = StringField(validators=[InputRequired(), DataRequired(), Length(min=4, max=100)],
@@ -29,29 +33,41 @@ class ShareForm(FlaskForm):
 
 
 class AdminForm(FlaskForm):
+    """
+    Form for admin to approve or reject study guides.
+    """
     submit = SubmitField('Submit')
 
+
 class SearchForm(FlaskForm):
+    """
+    Form for users to search study guides.
+    """
     query = StringField('Query', validators=[DataRequired()])
     submit = SubmitField('Search')
+
 
 @market_bp.route('/')
 @login_required
 def market_home():
+    """
+    Home page of the market application. Displays all study guides.
+    """
     user = current_user
     items = StudyGuide.query.all()
     return render_template('market.html', user=user, items=items)
 
 
-
-
-
 @market_bp.route('/share', methods=['GET', 'POST'])
 @login_required
 def share():
+    """
+    Page for users to share study guides.
+    """
     form = ShareForm()
     form.Creator.data = current_user.username
     if form.validate_on_submit():
+        # Create a new pending study guide
         new_pending_guide = PendingStudyGuide(
             Class=form.Class.data,
             UnitTopic=form.UnitTopic.data,
@@ -75,17 +91,26 @@ def share():
 @market_bp.route('/account', methods=['GET', 'POST'])
 @login_required
 def account_home():
+    """
+    User's account page.
+    """
     return render_template('Account.html', user=current_user)
 
 
 @market_bp.route('/success')
 def success():
+    """
+    Page displayed after a successful share.
+    """
     return "Successfully shared the study guide!"
 
 
 @market_bp.route('/admin', methods=['GET', 'POST'])
 @login_required
 def admin_home():
+    """
+    Admin's home page. Displays pending study guides and allows admin to approve or reject them.
+    """
     if not current_user.is_admin:
         flash('You do not have access to this page.', 'danger')
         return redirect(url_for('market_bp.market_home'))
@@ -96,6 +121,7 @@ def admin_home():
         action = request.form.get('action')
         guide_id = int(request.form.get('guide_id'))
         if action == 'approve':
+            # Approve a pending study guide
             approved_guide = PendingStudyGuide.query.get(guide_id)
             if approved_guide:
                 new_guide = StudyGuide(
@@ -112,6 +138,7 @@ def admin_home():
             else:
                 flash('Guide not found!', 'danger')
         elif action == 'reject':
+            # Reject a pending study guide
             rejected_guide = PendingStudyGuide.query.get(guide_id)
             if rejected_guide:
                 db.session.delete(rejected_guide)
@@ -131,6 +158,9 @@ def admin_home():
 @market_bp.route('/search', methods=['GET', 'POST'])
 @login_required
 def search():
+    """
+    Page for users to search study guides.
+    """
     form = SearchForm()
     if form.validate_on_submit():
         query = form.query.data
@@ -141,6 +171,9 @@ def search():
 @market_bp.route('/search/results')
 @login_required
 def results():
+    """
+    Page displaying search results.
+    """
     query = request.args.get('query')
     if query:
         search = f"%{query}%"

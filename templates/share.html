@@ -3,14 +3,20 @@
 <html data-bs-theme="light" lang="en">
 
 <head>
+    <!-- Meta tags for character encoding, viewport settings, and title -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>Share - ASD4ME</title>
+
+    <!-- Link to Bootstrap CSS file -->
     <link rel="stylesheet" href="/static/assets/bootstrap/css/bootstrap.min.css">
+
+    <!-- Link to custom CSS file -->
     <link rel="stylesheet" href="/static/assets/css/styles.min.css">
 </head>
 
 <body>
+    <!-- Navigation bar with brand, toggle button, and links -->
     <nav class="navbar navbar-expand-md fixed-top navbar-shrink py-3 navbar-light" id="mainNav">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="/market"><span>ASD4ME</span></a>
@@ -26,6 +32,8 @@
             </div>
         </div>
     </nav>
+
+    <!-- Section with heading, description, and form -->
     <section class="py-5 mt-5">
         <div class="container py-5">
             <div class="row">
@@ -37,6 +45,7 @@
             <div class="row d-flex justify-content-center">
                 <div class="col-md-6">
                     <div>
+                        <!-- Form for sharing study guide -->
                         <form class="p-3 p-xl-4" method="post" action="{{ url_for('market_bp.share') }}">
                             {{ form.hidden_tag() }}
                             <div class="mb-3">
@@ -68,8 +77,14 @@
             </div>
         </div>
     </section>
+
+    <!-- Footer section -->
     <footer></footer>
+
+    <!-- Link to Bootstrap JS file -->
     <script src="/static/assets/bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- Link to custom JS file -->
     <script src="/static/assets/js/script.min.js"></script>
 </body>
 

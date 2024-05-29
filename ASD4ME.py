@@ -27,9 +27,11 @@ login_manager.login_view = 'login'
 
 app.register_blueprint(market_bp, url_prefix='/market')  # Register the blueprint with a URL prefix
 
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
 
 class SignupForm(FlaskForm):
     username = StringField(validators=[InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
@@ -41,14 +43,17 @@ class SignupForm(FlaskForm):
         if existing_user_username:
             raise ValidationError('That username already exists. Please choose a different one.')
 
+
 class LoginForm(FlaskForm):
     username = StringField(validators=[InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
     password = PasswordField(validators=[InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
     submit = SubmitField('Login')
 
+
 @app.route('/')
 def home():
     return render_template('index.html')
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -60,15 +65,18 @@ def login():
             return redirect(url_for('market_bp.market_home'))  # Redirect to the market blueprint's home
     return render_template('login.html', form=form)
 
+
 @app.route('/logout', methods=['GET', 'POST'])
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('login'))
 
+
 @app.route('/contacts')
 def contacts():
     return render_template('contacts.html')
+
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -85,6 +93,7 @@ def signup():
         print(form.errors)  # Print validation errors to the console for debugging
 
     return render_template('signup.html', form=form)
+
 
 if __name__ == '__main__':
     with app.app_context():
