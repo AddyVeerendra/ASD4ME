@@ -53,8 +53,34 @@
                                 </li>
                             {% endfor %}
                         </ul>
+                        <form action="{{ url_for('market_bp.finalize_purchase') }}" method="post">
+                            {{ form.hidden_tag() }}
+                            <button class="btn btn-success mt-3" type="submit">Finalize Purchase</button>
+                        </form>
                     {% else %}
                         <p class="text-muted">Your cart is empty.</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row d-flex justify-content-center mt-5">
+                <div class="col-md-8">
+                    <h4 class="mb-4">Your Inventory</h4>
+                    {% if inventory %}
+                        <ul class="list-group">
+                            {% for item in inventory %}
+                                <li class="list-group-item">
+                                    <div>
+                                        <h5>{{ item.study_guide.Class }}</h5>
+                                        <p>{{ item.study_guide.UnitTopic }}</p>
+                                        <p><strong>Created by:</strong> {{ item.study_guide.Creator }}</p>
+                                        <p><strong>Price:</strong> ${{ item.study_guide.Price }}</p>
+                                        <a href="{{ item.study_guide.Link }}" class="btn btn-primary">Access Study Guide</a>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted">Your inventory is empty.</p>
                     {% endif %}
                 </div>
             </div>

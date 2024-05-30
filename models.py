@@ -36,3 +36,10 @@ class CartItem(db.Model):
     study_guide_id = db.Column(db.Integer, db.ForeignKey('study_guide.id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False, default=1)
     study_guide = db.relationship('StudyGuide')
+
+
+class Inventory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    study_guide_id = db.Column(db.Integer, db.ForeignKey('study_guide.id'), nullable=False)
+    study_guide = db.relationship('StudyGuide')

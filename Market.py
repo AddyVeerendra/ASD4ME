@@ -23,7 +23,7 @@ from flask import render_template
 # Database imports
 from extensions import db
 # Model imports
-from models import StudyGuide, PendingStudyGuide, Cart, CartItem
+from models import StudyGuide, PendingStudyGuide, Cart, CartItem, Inventory
 
 # Used for logging changes in consoles
 logging.basicConfig(level=logging.DEBUG)
@@ -150,6 +150,26 @@ def account_home():
 
     form = FlaskForm()
     return render_template('account.html', wallet=current_user.wallet, cart_items=cart_items, form=form)
+
+@market_bp.route('/finalize_purchase', methods=['POST'])
+@login_required
+def finalize_purchase():
+    cart = current_user.cart
+    if cart and cart.items:
+        total_cost = sum(item.study_guide.Price * item.quantity for item in cart.items)
+        if current_user.wallet >= total_cost:
+            current_user.wallet -= total_cost
+            for item in cart.items:
+                inventory_item = Inventory(user_id=current_user.id, study_guide_id=item.study_guide_id)
+                db.session.add(inventory_item)
+                db.session.delete(item)
+            db.session.commit()
+            flash('Purchase finalized and items added to your inventory.', 'success')
+        else:
+            flash('Insufficient funds in wallet.', 'danger')
+    else:
+        flash('Your cart is empty.', 'danger')
+    return redirect(url_for('market_bp.account_home'))
 
 @market_bp.route('/admin', methods=['GET', 'POST'])
 @login_required
