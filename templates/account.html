@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Account - ASD4ME</title>
     <link rel="stylesheet" href="/static/assets/bootstrap/css/bootstrap.min.css">
 </head>
-
 <body>
     <nav class="navbar navbar-expand-md fixed-top navbar-shrink py-3 navbar-light" id="mainNav">
         <div class="container">
@@ -30,7 +28,7 @@
             <div class="row">
                 <div class="col-md-8 col-xl-6 text-center mx-auto">
                     <h2 class="display-6 fw-bold mb-4">Account Details</h2>
-                    <p><strong>Wallet Balance:</strong> ${{ wallet_balance }}</p>
+                    <p><strong>Wallet Balance:</strong> ${{ wallet }}</p>
                 </div>
             </div>
             <div class="row d-flex justify-content-center">
@@ -39,12 +37,19 @@
                     {% if cart_items %}
                         <ul class="list-group">
                             {% for item in cart_items %}
-                                <li class="list-group-item">
-                                    <h5>{{ item.study_guide.Class }}</h5>
-                                    <p>{{ item.study_guide.UnitTopic }}</p>
-                                    <p><strong>Created by:</strong> {{ item.study_guide.Creator }}</p>
-                                    <p><strong>Price:</strong> ${{ item.study_guide.Price }}</p>
-                                    <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5>{{ item.study_guide.Class }}</h5>
+                                        <p>{{ item.study_guide.UnitTopic }}</p>
+                                        <p><strong>Created by:</strong> {{ item.study_guide.Creator }}</p>
+                                        <p><strong>Price:</strong> ${{ item.study_guide.Price }}</p>
+                                        <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+                                    </div>
+                                    <form action="{{ url_for('market_bp.account_home') }}" method="post">
+                                        {{ form.hidden_tag() }}
+                                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                                        <button class="btn btn-danger" type="submit">Remove</button>
+                                    </form>
                                 </li>
                             {% endfor %}
                         </ul>
@@ -57,6 +62,4 @@
     </section>
     <script src="/static/assets/bootstrap/js/bootstrap.min.js"></script>
 </body>
-
 </html>
-

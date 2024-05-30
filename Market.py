@@ -131,16 +131,25 @@ def share():
 @market_bp.route('/account', methods=['GET', 'POST'])
 @login_required
 def account_home():
-    # Get the current user's cart
     cart = current_user.cart
-    # Get all cart items
-    if cart:
-        cart_items = CartItem.query.filter_by(cart_id=cart.id).all()
-    else:
-        []
-    # Render account.html for the users to see their account home page
-    return render_template('account.html', wallet=current_user.wallet, cart_items=cart_items)
+    cart_items = CartItem.query.filter_by(cart_id=cart.id).all() if cart else []
 
+    if request.method == 'POST':
+        item_id = request.form.get('item_id')
+        if item_id:
+            cart_item = CartItem.query.get(item_id)
+            if cart_item and cart_item.cart.user_id == current_user.id:
+                db.session.delete(cart_item)
+                db.session.commit()
+                flash('Item removed from cart.', 'success')
+            else:
+                flash('Invalid item or permission denied.', 'danger')
+        else:
+            flash('Item ID missing.', 'danger')
+        return redirect(url_for('market_bp.account_home'))
+
+    form = FlaskForm()
+    return render_template('account.html', wallet=current_user.wallet, cart_items=cart_items, form=form)
 
 @market_bp.route('/admin', methods=['GET', 'POST'])
 @login_required
@@ -245,9 +254,9 @@ def results():
                         cart = current_user.cart
                     # Check if the item is already in the cart
                     cart_item = CartItem.query.filter_by(cart_id=cart.id, study_guide_id=study_guide_id).first()
-                    # If the item is in the cart, increase the quantity by 1
+                    # If the item is in the cart, do nothing
                     if cart_item:
-                        cart_item.quantity += 1
+                        cart_item.quantity += 0
                     # If the item is not in the cart, add the item to the cart
                     else:
                         # Create a new cart item
