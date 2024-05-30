@@ -10,6 +10,7 @@ Market.py is the main file for the market application. It contains the following
     - search: Page for users to search study guides.
     - results: Page displaying search results.
 """
+# General flask imports
 from flask import Blueprint, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 from flask_wtf import FlaskForm
@@ -19,8 +20,10 @@ import logging
 from wtforms.validators import DataRequired
 from flask import render_template
 
-from extensions import db  # Import the database object from extensions.py
-from models import StudyGuide, PendingStudyGuide  # Import the models from models.py
+# Database imports
+from extensions import db
+# Model imports
+from models import StudyGuide, PendingStudyGuide, Cart, CartItem
 
 # Used for logging changes in consoles
 logging.basicConfig(level=logging.DEBUG)
@@ -89,8 +92,11 @@ def market_home():
     Home page of the market application. Displays basic user info such as wallet balance, and allows navigation to other
     parts of the website. Also displays all study guides available for purchase.
     """
+    # Get the current user
     user = current_user
+    # Get all study guides
     items = StudyGuide.query.all()
+    # Render market.html for the users to see the market home page
     return render_template('market.html', user=user, items=items)
 
 
@@ -125,11 +131,15 @@ def share():
 @market_bp.route('/account', methods=['GET', 'POST'])
 @login_required
 def account_home():
-    """
-    User's account page. Displays account info such as wallet balance and cart. Allows users to purchase cart info
-    """
-    # Render Account.html for the users to see their account info
-    return render_template('Account.html', user=current_user)
+    # Get the current user's cart
+    cart = current_user.cart
+    # Get all cart items
+    if cart:
+        cart_items = CartItem.query.filter_by(cart_id=cart.id).all()
+    else:
+        []
+    # Render account.html for the users to see their account home page
+    return render_template('account.html', wallet=current_user.wallet, cart_items=cart_items)
 
 
 @market_bp.route('/admin', methods=['GET', 'POST'])
@@ -191,27 +201,68 @@ def search():
     """
     Page for users to search study guides.
     """
+    # Initialize form
     form = SearchForm()
+    # Check for form validation
     if form.validate_on_submit():
+        # Get the query from the form
         query = form.query.data
+        # Redirect to the results page using the query
         return redirect(url_for('market_bp.results', query=query))
+    # Render searchbar.html for the users to search for study guides
     return render_template('searchbar.html', form=form, user=current_user)
 
 
-@market_bp.route('/search/results')
+@market_bp.route('/search/results', methods=['GET', 'POST'])
 @login_required
 def results():
-    """
-    Page displaying search results.
-    """
+    # Initialize form
+    form = FlaskForm()
+    # Check whether the request went through
+    if request.method == 'POST':
+        # Get the action from the form
+        action = request.form.get('action')
+        # Check if the action is add_to_cart in results.html (Obtained from clicking the "add-to-cart" button
+        if action == 'add_to_cart':
+            # Get the study guide id from the form
+            study_guide_id = request.form.get('study_guide_id')
+            # Check if the study guide id is valid
+            if study_guide_id:
+                # Get the study guide from the database
+                study_guide = StudyGuide.query.get(study_guide_id)
+                # Check if the study guide exists
+                if study_guide:
+                    # Check if the user has a cart.
+                    if not current_user.cart:
+                        # If the user does not have a cart, create a new cart
+                        cart = Cart(user_id=current_user.id)
+                        # Add the cart to the database
+                        db.session.add(cart)
+                        # Commit changes to the database
+                        db.session.commit()
+                    # If the user has a cart, get the cart
+                    else:
+                        cart = current_user.cart
+                    # Check if the item is already in the cart
+                    cart_item = CartItem.query.filter_by(cart_id=cart.id, study_guide_id=study_guide_id).first()
+                    # If the item is in the cart, increase the quantity by 1
+                    if cart_item:
+                        cart_item.quantity += 1
+                    # If the item is not in the cart, add the item to the cart
+                    else:
+                        # Create a new cart item
+                        cart_item = CartItem(cart_id=cart.id, study_guide_id=study_guide_id, quantity=1)
+                        # Add the cart item to the database
+                        db.session.add(cart_item)
+                    # Commit changes to the database
+                    db.session.commit()
     query = request.args.get('query')
+    results = []
     if query:
-        search = f"%{query}%"
         results = StudyGuide.query.filter(
-            StudyGuide.Class.ilike(search) |
-            StudyGuide.UnitTopic.ilike(search) |
-            StudyGuide.Creator.ilike(search)
-        ).order_by(StudyGuide.Price).all()
-    else:
-        results = []
-    return render_template('results.html', results=results, query=query, user=current_user)
+            (StudyGuide.Class.ilike(f'%{query}%')) |
+            (StudyGuide.UnitTopic.ilike(f'%{query}%')) |
+            (StudyGuide.Creator.ilike(f'%{query}%'))
+        ).all()
+
+    return render_template('results.html', query=query, results=results, form=form)
