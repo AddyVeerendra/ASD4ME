@@ -28,7 +28,7 @@
                                 <td>{{ guide.Class }}</td>
                                 <td>{{ guide.Creator }}</td>
                                 <td>{{ guide.Price }}</td>
-                                <td><a href="{{ guide.Link }}">Link</a></td>
+                                <td><a href="{{ guide.Link if guide.Link.startswith('http') else 'https://' + guide.Link }}">Link</a></td>
                                 <td>
                                     <form method="post" action="{{ url_for('market_bp.admin_home') }}">
                                         {{ form.csrf_token }}

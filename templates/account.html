@@ -74,7 +74,7 @@
                                         <p>{{ item.study_guide.UnitTopic }}</p>
                                         <p><strong>Created by:</strong> {{ item.study_guide.Creator }}</p>
                                         <p><strong>Price:</strong> ${{ item.study_guide.Price }}</p>
-                                        <a href="{{ item.study_guide.Link }}" class="btn btn-primary">Access Study Guide</a>
+                                        <a href="{{ item.study_guide.Link if item.study_guide.Link.startswith('http') else 'https://' + item.study_guide.Link }}" class="btn btn-primary">Access Study Guide</a>
                                     </div>
                                 </li>
                             {% endfor %}

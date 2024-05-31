@@ -148,8 +148,9 @@ def account_home():
             flash('Item ID missing.', 'danger')
         return redirect(url_for('market_bp.account_home'))
 
+    inventory_items = Inventory.query.filter_by(user_id=current_user.id).all()
     form = FlaskForm()
-    return render_template('account.html', wallet=current_user.wallet, cart_items=cart_items, form=form)
+    return render_template('account.html', wallet=current_user.wallet, cart_items=cart_items, inventory=inventory_items, form=form)
 
 @market_bp.route('/finalize_purchase', methods=['POST'])
 @login_required
@@ -164,11 +165,6 @@ def finalize_purchase():
                 db.session.add(inventory_item)
                 db.session.delete(item)
             db.session.commit()
-            flash('Purchase finalized and items added to your inventory.', 'success')
-        else:
-            flash('Insufficient funds in wallet.', 'danger')
-    else:
-        flash('Your cart is empty.', 'danger')
     return redirect(url_for('market_bp.account_home'))
 
 @market_bp.route('/admin', methods=['GET', 'POST'])

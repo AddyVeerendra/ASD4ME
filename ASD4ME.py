@@ -88,10 +88,6 @@ def signup():
         db.session.commit()
         flash('Account created successfully!', 'success')
         return redirect(url_for('login'))
-    else:
-        flash('Error creating account. Please check the form and try again.', 'danger')
-        print(form.errors)  # Print validation errors to the console for debugging
-
     return render_template('signup.html', form=form)
 
 

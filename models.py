@@ -1,6 +1,7 @@
 from extensions import db
 from flask_login import UserMixin
 
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
@@ -8,6 +9,7 @@ class User(db.Model, UserMixin):
     wallet = db.Column(db.Integer, nullable=False, default=0)
     is_admin = db.Column(db.Boolean, default=False, nullable=False)
     cart = db.relationship('Cart', uselist=False, backref='user')
+
 
 class StudyGuide(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -17,6 +19,7 @@ class StudyGuide(db.Model):
     Creator = db.Column(db.String(20), nullable=False)
     Link = db.Column(db.String(100), nullable=False)
 
+
 class PendingStudyGuide(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     Class = db.Column(db.String(20), nullable=False)
@@ -25,10 +28,12 @@ class PendingStudyGuide(db.Model):
     Creator = db.Column(db.String(20), nullable=False)
     Link = db.Column(db.String(100), nullable=False)
 
+
 class Cart(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     items = db.relationship('CartItem', backref='cart', lazy=True)
+
 
 class CartItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -43,3 +48,4 @@ class Inventory(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     study_guide_id = db.Column(db.Integer, db.ForeignKey('study_guide.id'), nullable=False)
     study_guide = db.relationship('StudyGuide')
+    user = db.relationship('User', backref='inventory_items')
