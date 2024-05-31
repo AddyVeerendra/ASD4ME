@@ -10,25 +10,22 @@ Market.py is the main file for the market application. It contains the following
     - search: Page for users to search study guides.
     - results: Page displaying search results.
 """
+
 # General flask imports
-from flask import Blueprint, redirect, url_for, flash, request
+from flask import Blueprint, redirect, url_for, request
+from flask import render_template
 from flask_login import login_required, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, IntegerField
-from wtforms.validators import InputRequired, Length, NumberRange
-import logging
 from wtforms.validators import DataRequired
-from flask import render_template
+from wtforms.validators import InputRequired, Length, NumberRange
 
 # Database imports
 from extensions import db
 # Model imports
 from models import StudyGuide, PendingStudyGuide, Cart, CartItem, Inventory
 
-# Used for logging changes in consoles
-logging.basicConfig(level=logging.DEBUG)
-
-# Blueprint for the market application
+# Blueprint for the market application (Accessed by ASD4ME.py and HTML templates)
 market_bp = Blueprint('market_bp', __name__)
 
 '''
@@ -131,41 +128,70 @@ def share():
 @market_bp.route('/account', methods=['GET', 'POST'])
 @login_required
 def account_home():
+    """
+    account_home is the user's account page, which displays account info such as wallet balance and cart. This function
+    gives users the option to remove study guides, finalize their cart purchases, and view items in their inventory.
+    """
+    # Fetch current user's cart
     cart = current_user.cart
+    # Query user's cart database to get all the items
     cart_items = CartItem.query.filter_by(cart_id=cart.id).all() if cart else []
-
+    # Check for a request in account.html
     if request.method == 'POST':
+        # Get the item_id from the form
         item_id = request.form.get('item_id')
+        # Check if the item_id is valid
         if item_id:
+            # Get the item_id of the study guide in the cart
             cart_item = CartItem.query.get(item_id)
+            # Check if the cart_item exists, and whether the current user's id matches the user_id stored in cart_item
             if cart_item and cart_item.cart.user_id == current_user.id:
+                # Delete the cart_item from the database
                 db.session.delete(cart_item)
+                # Commit changes to the database
                 db.session.commit()
-                flash('Item removed from cart.', 'success')
-            else:
-                flash('Invalid item or permission denied.', 'danger')
-        else:
-            flash('Item ID missing.', 'danger')
+        # Redirect to the account page after removed
         return redirect(url_for('market_bp.account_home'))
 
+    # Fetch all the user's inventory items from their inventory database
     inventory_items = Inventory.query.filter_by(user_id=current_user.id).all()
+    # Initialize the form
     form = FlaskForm()
+    # Render the account.html template (Setting wallet, cart_items, inventory_items, and the form to what is necessary)
     return render_template('account.html', wallet=current_user.wallet, cart_items=cart_items, inventory=inventory_items, form=form)
+
 
 @market_bp.route('/finalize_purchase', methods=['POST'])
 @login_required
 def finalize_purchase():
+    """
+    finalize_purchase allows users to finish adding the items in their cart to their inventory, and accordingly checks
+    and subtracts from wallet balance. If the wallet_balance is high enough, the transaction is completed and items are
+    moved to their inventory. Otherwise, it does not go through.
+    """
+    # Get the current user's cart
     cart = current_user.cart
+    # Check if the cart exists and if there are items in the cart
     if cart and cart.items:
+        # Calculate the total cost by taking the sum of all the study guides in the cart
         total_cost = sum(item.study_guide.Price * item.quantity for item in cart.items)
+        # Check if the user's wallet balance is greater than or equal to the total cost
         if current_user.wallet >= total_cost:
+            # Subtract the necessary costs from their wallet
             current_user.wallet -= total_cost
+            # Iterate through each item in their cart
             for item in cart.items:
+                # Create a new inventory_item for each study guide in the cart
                 inventory_item = Inventory(user_id=current_user.id, study_guide_id=item.study_guide_id)
+                # Add the inventory_item to the Inventory table
                 db.session.add(inventory_item)
+                # Delete the item from the Cart table
                 db.session.delete(item)
+            # Commit changes to the database
             db.session.commit()
+    # Redirect to the account page
     return redirect(url_for('market_bp.account_home'))
+
 
 @market_bp.route('/admin', methods=['GET', 'POST'])
 @login_required
@@ -208,12 +234,6 @@ def admin_home():
             if rejected_guide:
                 db.session.delete(rejected_guide)
                 db.session.commit()
-                flash('Guide rejected successfully!', 'success')
-            else:
-                flash('Guide not found!', 'danger')
-        else:
-            flash('Form validation failed', 'danger')
-
         return redirect(url_for('market_bp.admin_home'))
 
     pending_guides = PendingStudyGuide.query.all()
@@ -224,7 +244,7 @@ def admin_home():
 @login_required
 def search():
     """
-    Page for users to search study guides.
+    Page for users to search study guides. Users enter a string in searchbar.html and the string is retrieved and stored
     """
     # Initialize form
     form = SearchForm()
