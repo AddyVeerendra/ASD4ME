@@ -14,7 +14,7 @@ Market.py is the main file for the market application. It contains the following
 # General flask imports
 from flask import Blueprint, redirect, url_for, request
 from flask import render_template
-from flask_login import login_required, current_user
+from flask_login import login_required, current_user, logout_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, IntegerField
 from wtforms.validators import DataRequired
@@ -188,6 +188,11 @@ def finalize_purchase():
             db.session.add(inventory_item)
 
     current_user.wallet -= total_cost
+
+    # Delete all items in the cart
+    CartItem.query.filter_by(cart_id=cart.id).delete()
+
+    # Delete the cart itself
     db.session.delete(cart)
     db.session.commit()
 
@@ -312,3 +317,9 @@ def results():
         ).all()
 
     return render_template('results.html', query=query, results=results, form=form)
+
+@market_bp.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('home'))
