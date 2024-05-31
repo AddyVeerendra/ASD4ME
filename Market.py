@@ -23,7 +23,7 @@ from wtforms.validators import InputRequired, Length, NumberRange
 # Database imports
 from extensions import db
 # Model imports
-from models import StudyGuide, PendingStudyGuide, Cart, CartItem, Inventory
+from models import StudyGuide, PendingStudyGuide, Cart, CartItem, Inventory, User
 
 # Blueprint for the market application (Accessed by ASD4ME.py and HTML templates)
 market_bp = Blueprint('market_bp', __name__)
@@ -160,7 +160,6 @@ def account_home():
     # Render the account.html template (Setting wallet, cart_items, inventory_items, and the form to what is necessary)
     return render_template('account.html', wallet=current_user.wallet, cart_items=cart_items, inventory=inventory_items, form=form)
 
-
 @market_bp.route('/finalize_purchase', methods=['POST'])
 @login_required
 def finalize_purchase():
@@ -169,27 +168,29 @@ def finalize_purchase():
     and subtracts from wallet balance. If the wallet_balance is high enough, the transaction is completed and items are
     moved to their inventory. Otherwise, it does not go through.
     """
-    # Get the current user's cart
     cart = current_user.cart
-    # Check if the cart exists and if there are items in the cart
-    if cart and cart.items:
-        # Calculate the total cost by taking the sum of all the study guides in the cart
-        total_cost = sum(item.study_guide.Price * item.quantity for item in cart.items)
-        # Check if the user's wallet balance is greater than or equal to the total cost
-        if current_user.wallet >= total_cost:
-            # Subtract the necessary costs from their wallet
-            current_user.wallet -= total_cost
-            # Iterate through each item in their cart
-            for item in cart.items:
-                # Create a new inventory_item for each study guide in the cart
-                inventory_item = Inventory(user_id=current_user.id, study_guide_id=item.study_guide_id)
-                # Add the inventory_item to the Inventory table
-                db.session.add(inventory_item)
-                # Delete the item from the Cart table
-                db.session.delete(item)
-            # Commit changes to the database
-            db.session.commit()
-    # Redirect to the account page
+    if not cart or not cart.items:
+        return redirect(url_for('market_bp.account_home'))
+
+    total_cost = sum(item.study_guide.Price * item.quantity for item in cart.items)
+    if current_user.wallet < total_cost:
+        return redirect(url_for('market_bp.account_home'))
+
+    for item in cart.items:
+        study_guide = item.study_guide
+        creator = User.query.filter_by(username=study_guide.Creator).first()
+        if creator:
+            creator.wallet += study_guide.Price * item.quantity
+
+        # Add study guide to user's inventory
+        for _ in range(item.quantity):
+            inventory_item = Inventory(user_id=current_user.id, study_guide_id=study_guide.id)
+            db.session.add(inventory_item)
+
+    current_user.wallet -= total_cost
+    db.session.delete(cart)
+    db.session.commit()
+
     return redirect(url_for('market_bp.account_home'))
 
 
