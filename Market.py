@@ -1,14 +1,22 @@
 """
-Market.py is the main file for the market application. It contains the following functions:
-    - market_home: Home page of the market application. Displays basic user info such as wallet balance, and allows
-    navigation to other parts of the website. Also displays all study guides available for purchase.
-    - share: Page for users to share study guides. Users enter the necessary information to share a study guide in
-    share.html
-    - account_home: User's account page. Displays account info such as wallet balance and cart. Allows users to purchase
-    cart info
-    - admin_home: Admin's home page. Displays pending study guides and allows admin to approve or reject them.
-    - search: Page for users to search study guides.
-    - results: Page displaying search results.
+Market.py is a blueprint that contains all the routes and functions for the market application. It is accessed by
+ASD4ME.py when necessary, and contains many market operations such as purchasing and sharing. The functions in this
+file are:
+        - market_home(): Home page of the market application. Displays basic user info such as wallet balance, and
+        allows navigation to other parts of the website. Also displays all study guides available for purchase.
+        - share(): Page for users to share study guides. Users enter the necessary information to share a study guide in
+        share.html
+        - account_home(): account_home is the user's account page, which displays account info such as wallet balance
+        and cart. This function gives users the option to remove study guides, finalize their cart purchases, and view
+        items in their inventory.
+        - finalize_purchase(): finalize_purchase allows users to finish adding the items in their cart to their
+        inventory, and accordingly checks and subtracts from wallet balance. If the wallet_balance is high enough, the
+        transaction is completed and items are moved to their inventory. Otherwise, it does not go through.
+        - admin_home(): Admin home page. Displays pending study guides and allows admin to approve or reject them.
+        - search(): Page for users to search study guides. Users enter a string in searchbar.html and the string is
+        retrieved and stored
+        - results(): results allows users to view the results of their search query, and add study guides to their cart
+        - logout(): logout logs the user out of the website.
 """
 
 # General flask imports
@@ -25,9 +33,6 @@ from extensions import db
 # Model imports
 from models import StudyGuide, PendingStudyGuide, Cart, CartItem, Inventory, User
 
-# Blueprint for the market application (Accessed by ASD4ME.py and HTML templates)
-market_bp = Blueprint('market_bp', __name__)
-
 '''
 Things to know:
 @login_required: Checks if the user is logged in. If not, the page does not open.
@@ -38,6 +43,9 @@ InputRequired: Checks if the field is filled
 Length: Checks if the length of the field is within a certain range
 NumberRange: Checks if the number is within a certain range
 '''
+
+# Blueprint for the market application (Accessed by ASD4ME.py and HTML templates)
+market_bp = Blueprint('market_bp', __name__)
 
 
 class ShareForm(FlaskForm):
@@ -158,7 +166,9 @@ def account_home():
     # Initialize the form
     form = FlaskForm()
     # Render the account.html template (Setting wallet, cart_items, inventory_items, and the form to what is necessary)
-    return render_template('account.html', wallet=current_user.wallet, cart_items=cart_items, inventory=inventory_items, form=form)
+    return render_template('account.html', wallet=current_user.wallet, cart_items=cart_items, inventory=inventory_items,
+                           form=form)
+
 
 @market_bp.route('/finalize_purchase', methods=['POST'])
 @login_required
@@ -168,25 +178,31 @@ def finalize_purchase():
     and subtracts from wallet balance. If the wallet_balance is high enough, the transaction is completed and items are
     moved to their inventory. Otherwise, it does not go through.
     """
+    # Fetch the current user's cart
     cart = current_user.cart
-    if not cart or not cart.items:
-        return redirect(url_for('market_bp.account_home'))
-
+    # Calculate the total cost of all the items in the cart
     total_cost = sum(item.study_guide.Price * item.quantity for item in cart.items)
+    # Check if the user does not have enough money in their wallet
     if current_user.wallet < total_cost:
+        # Redirect to the account page if they don't have enough money
         return redirect(url_for('market_bp.account_home'))
-
+    # For each item in the cart
     for item in cart.items:
+        # Get the corresponding study guide from the item
         study_guide = item.study_guide
+        # Find the creator using info from the study guide
         creator = User.query.filter_by(username=study_guide.Creator).first()
+        # If the creator exists, add the price of the study guide to their wallet
         if creator:
             creator.wallet += study_guide.Price * item.quantity
-
-        # Add study guide to user's inventory
+        # For each item in the cart
         for _ in range(item.quantity):
+            # Create a new inventory item for the user
             inventory_item = Inventory(user_id=current_user.id, study_guide_id=study_guide.id)
+            # Add the inventory item to the database
             db.session.add(inventory_item)
 
+    # Subtract the total cost from the user's wallet
     current_user.wallet -= total_cost
 
     # Delete all items in the cart
@@ -194,8 +210,10 @@ def finalize_purchase():
 
     # Delete the cart itself
     db.session.delete(cart)
+    # Commit changes to the database
     db.session.commit()
 
+    # Redirect to the account page
     return redirect(url_for('market_bp.account_home'))
 
 
@@ -203,7 +221,7 @@ def finalize_purchase():
 @login_required
 def admin_home():
     """
-    Admin's home page. Displays pending study guides and allows admin to approve or reject them.
+    Admin home page. Displays pending study guides and allows admin to approve or reject them.
     """
     # Check if the user is an admin. If not, redirect to the market home page (is_admin is a boolean in user database)
     if not current_user.is_admin:
@@ -238,11 +256,15 @@ def admin_home():
             # Reject a pending study guide
             rejected_guide = PendingStudyGuide.query.get(guide_id)
             if rejected_guide:
+                # Delete the rejected study guide from the database
                 db.session.delete(rejected_guide)
+                # Commit changes to the database
                 db.session.commit()
+        # Redirect to the admin page
         return redirect(url_for('market_bp.admin_home'))
-
+    # Retrieve all pending study guides
     pending_guides = PendingStudyGuide.query.all()
+    # Render admin.html for the admin to approve or reject study guides
     return render_template('admin.html', pending_guides=pending_guides, user=current_user, form=form)
 
 
@@ -267,6 +289,9 @@ def search():
 @market_bp.route('/search/results', methods=['GET', 'POST'])
 @login_required
 def results():
+    """
+    results allows users to view the results of their search query, and add study guides to their cart
+    """
     # Initialize form
     form = FlaskForm()
     # Check whether the request went through
@@ -307,19 +332,31 @@ def results():
                         db.session.add(cart_item)
                     # Commit changes to the database
                     db.session.commit()
+    # Get the query from the URL
     query = request.args.get('query')
-    results = []
+    # Get the study guides from the database using the query
     if query:
+        # Get the study guides from the database by filtering using the query
         results = StudyGuide.query.filter(
             (StudyGuide.Class.ilike(f'%{query}%')) |
             (StudyGuide.UnitTopic.ilike(f'%{query}%')) |
             (StudyGuide.Creator.ilike(f'%{query}%'))
         ).all()
+    else:
+        # If there is no query, set results to an empty list
+        results = []
 
+    # Render the results.html template for the users to view the results of their search query
     return render_template('results.html', query=query, results=results, form=form)
+
 
 @market_bp.route('/logout')
 @login_required
 def logout():
+    """
+    This function logs the user out of the website, ending their session.
+    """
+    # Log the user out
     logout_user()
+    # Redirect to the home page
     return redirect(url_for('home'))
