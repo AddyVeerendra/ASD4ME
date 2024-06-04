@@ -1,48 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+    <!-- Set character encoding -->
     <meta charset="UTF-8">
+    <!-- Set viewport for responsive design -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Set page title -->
     <title>Search - ASD4ME</title>
+    <!-- Include Bootstrap CSS -->
     <link rel="stylesheet" href="/static/assets/bootstrap/css/bootstrap.min.css">
 </head>
 
 <body>
+    <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-md fixed-top navbar-shrink py-3 navbar-light" id="mainNav">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="/market"><span>ASD4ME</span></a>
-            <button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1">
+            <!-- Website Logo with link to market -->
+            <a class="navbar-brand d-flex align-items-center" href="/market">
+                <span>ASD4ME</span>
+            </a>
+            <!-- Navigation Menu Toggle Button -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navcol-1">
                 <span class="visually-hidden">Toggle navigation</span>
                 <span class="navbar-toggler-icon"></span>
             </button>
+            <!-- Collapsible Navigation Menu -->
             <div class="collapse navbar-collapse" id="navcol-1">
                 <ul class="navbar-nav mx-auto">
-                    <li class="nav-item"><a class="nav-link active" href="/market/search">Search</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/market/share">Share</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/market/account">My Cart</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/market/logout">Logout</a></li>
+                    <!-- Search Link -->
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/market/search">Search</a>
+                    </li>
+                    <!-- Share Link -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="/market/share">Share</a>
+                    </li>
+                    <!-- My Cart Link -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="/market/account">My Cart</a>
+                    </li>
+                    <!-- Logout Link -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="/market/logout">Logout</a>
+                    </li>
                 </ul>
+                <!-- Account Button -->
                 <a class="btn btn-primary shadow" role="button" href="/market/account">Account</a>
             </div>
         </div>
     </nav>
+
+    <!-- Search Section -->
     <section class="py-5 mt-5">
         <div class="container py-5">
             <div class="row">
                 <div class="col-md-8 col-xl-6 text-center mx-auto">
-                    <h2 class="display-6 fw-bold mb-4">Looking for a&nbsp;<span class="underline">study guide?</span></h2>
+                    <!-- Heading -->
+                    <h2 class="display-6 fw-bold mb-4">Looking for a study guide?</h2>
+                    <!-- Subheading -->
                     <p class="text-muted">Search for a class, subject, or username here</p>
                 </div>
             </div>
             <div class="row d-flex justify-content-center">
                 <div class="col-md-6">
+                    <!-- Search Form -->
                     <div>
                         <form class="p-3 p-xl-4" method="post" action="{{ url_for('market_bp.search') }}">
+                            <!-- Hidden form tag -->
                             {{ form.hidden_tag() }}
+                            <!-- Search Input -->
                             <div class="mb-3">
                                 {{ form.query(class="shadow form-control", placeholder="Search") }}
                             </div>
+                            <!-- Submit Button -->
                             <div>
                                 {{ form.submit(class="btn btn-primary shadow d-block w-100") }}
                             </div>
@@ -52,7 +82,8 @@
             </div>
         </div>
     </section>
+
+    <!-- Include Bootstrap JavaScript -->
     <script src="/static/assets/bootstrap/js/bootstrap.min.js"></script>
 </body>
-
 </html>

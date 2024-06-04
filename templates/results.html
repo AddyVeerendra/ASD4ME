@@ -2,20 +2,26 @@
 <html lang="en">
 
 <head>
+    <!-- Meta tags for character encoding and responsive design -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Search Results - ASD4ME</title>
+    <!-- Link to Bootstrap CSS -->
     <link rel="stylesheet" href="/static/assets/bootstrap/css/bootstrap.min.css">
 </head>
 
 <body>
+    <!-- Navigation bar -->
     <nav class="navbar navbar-expand-md fixed-top navbar-shrink py-3 navbar-light" id="mainNav">
         <div class="container">
+            <!-- Brand name linking to the market page -->
             <a class="navbar-brand d-flex align-items-center" href="/market"><span>ASD4ME</span></a>
+            <!-- Toggle button for navigation menu in mobile view -->
             <button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1">
                 <span class="visually-hidden">Toggle navigation</span>
                 <span class="navbar-toggler-icon"></span>
             </button>
+            <!-- Navigation links -->
             <div class="collapse navbar-collapse" id="navcol-1">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item"><a class="nav-link active" href="/market/search">Search</a></li>
@@ -23,27 +29,35 @@
                     <li class="nav-item"><a class="nav-link" href="/market/account">My Cart</a></li>
                     <li class="nav-item"><a class="nav-link" href="/market/logout">Logout</a></li>
                 </ul>
+                <!-- Account button -->
                 <a class="btn btn-primary shadow" role="button" href="/market/account">Account</a>
             </div>
         </div>
     </nav>
+
+    <!-- Main content section for displaying search results -->
     <section class="py-5 mt-5">
         <div class="container py-5">
+            <!-- Heading for search results with the search query -->
             <div class="row">
                 <div class="col-md-8 col-xl-6 text-center mx-auto">
                     <h2 class="display-6 fw-bold mb-4">Search Results for "{{ query }}"</h2>
                 </div>
             </div>
+            <!-- Results list or no results message -->
             <div class="row d-flex justify-content-center">
                 <div class="col-md-8">
                     {% if results %}
+                        <!-- List of search results -->
                         <ul class="list-group">
                             {% for result in results %}
                                 <li class="list-group-item">
+                                    <!-- Study guide details -->
                                     <h5>{{ result.Class }}</h5>
                                     <p>{{ result.UnitTopic }}</p>
                                     <p><strong>Created by:</strong> {{ result.Creator }}</p>
                                     <p><strong>Price:</strong> ${{ result.Price }}</p>
+                                    <!-- Form to add study guide to cart -->
                                     <form method="post" action="{{ url_for('market_bp.results') }}">
                                         {{ form.hidden_tag() }}
                                         <input type="hidden" name="study_guide_id" value="{{ result.id }}">
@@ -53,12 +67,15 @@
                             {% endfor %}
                         </ul>
                     {% else %}
+                        <!-- Message when no results are found -->
                         <p class="text-muted">No results found for your search. Please try again with a different search.</p>
                     {% endif %}
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- Bootstrap JavaScript -->
     <script src="/static/assets/bootstrap/js/bootstrap.min.js"></script>
 </body>
 

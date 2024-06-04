@@ -2,51 +2,72 @@
 <html data-bs-theme="light" lang="en">
 
 <head>
+    <!-- Set character encoding and viewport properties -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <!-- Set page title -->
     <title>Log in - ASD4ME</title>
+    <!-- Include Bootstrap CSS library -->
     <link rel="stylesheet" href="/static/assets/bootstrap/css/bootstrap.min.css">
+    <!-- Include additional styles -->
     <link rel="stylesheet" href="/static/assets/css/styles.min.css">
 </head>
 
 <body>
+    <!-- Navigation bar -->
     <nav class="navbar navbar-expand-md fixed-top navbar-shrink py-3 navbar-light" id="mainNav">
         <div class="container">
+            <!-- Website logo and link to homepage -->
             <a class="navbar-brand d-flex align-items-center" href="/"><span>ASD4ME</span></a>
+            <!-- Navigation toggle button for smaller screens -->
             <button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1">
                 <span class="visually-hidden">Toggle navigation</span>
                 <span class="navbar-toggler-icon"></span>
             </button>
+            <!-- Collapsible navigation links -->
             <div class="collapse navbar-collapse" id="navcol-1">
+                <!-- Centered navigation links -->
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="/contacts">Contact Us</a></li>
                 </ul>
+                <!-- Sign up and Log in buttons -->
                 <a class="btn btn-primary shadow" role="button" href="/signup">Sign up</a>
                 <a class="btn btn-primary" role="button" href="/login">Log in</a>
             </div>
         </div>
     </nav>
+
+    <!-- Login section -->
     <section class="py-4 py-md-5 my-5">
         <div class="container py-md-5">
+            <!-- Row containing illustration and login form -->
             <div class="row">
+                <!-- Illustration column -->
                 <div class="col-md-6 text-center">
                     <img class="img-fluid w-100" src="/static/assets/img/illustrations/login.svg" alt="Login Illustration">
                 </div>
+                <!-- Login form column -->
                 <div class="col-md-5 col-xl-4 text-center text-md-start">
+                    <!-- Login heading -->
                     <h2 class="display-6 fw-bold mb-5">
                         <span class="underline pb-1"><strong>Login</strong></span>
                     </h2>
+                    <!-- Login form -->
                     <form method="post" action="{{ url_for('login') }}" data-bs-theme="light">
+                        <!-- Hidden form fields -->
                         {{ form.hidden_tag() }}
+                        <!-- Username field -->
                         <div class="mb-3">
                             {{ form.username.label(class="form-label") }}
                             {{ form.username(class="shadow-sm form-control") }}
                         </div>
+                        <!-- Password field -->
                         <div class="mb-3">
                             {{ form.password.label(class="form-label") }}
                             {{ form.password(class="shadow-sm form-control") }}
                         </div>
+                        <!-- Submit button -->
                         <div class="mb-5">
                             {{ form.submit(class="btn btn-primary shadow") }}
                         </div>
@@ -55,7 +76,10 @@
             </div>
         </div>
     </section>
+
+    <!-- Include Bootstrap JavaScript library -->
     <script src="/static/assets/bootstrap/js/bootstrap.min.js"></script>
+    <!-- Include additional scripts -->
     <script src="/static/assets/js/script.min.js"></script>
 </body>
 

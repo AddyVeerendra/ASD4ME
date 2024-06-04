@@ -2,53 +2,72 @@
 <html data-bs-theme="light" lang="en">
 
 <head>
+    <!-- Meta tags for character encoding, viewport settings, and title -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>Sign up - ASD4ME</title>
+
+    <!-- Link to Bootstrap CSS file -->
     <link rel="stylesheet" href="/static/assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/assets/css/styles.min.css">
 </head>
 
 <body>
+    <!-- Navigation bar with brand, links, and buttons -->
     <nav class="navbar navbar-expand-md fixed-top navbar-shrink py-3 navbar-light" id="mainNav">
         <div class="container">
+            <!-- Brand name linking to the homepage -->
             <a class="navbar-brand d-flex align-items-center" href="/"><span>ASD4ME</span></a>
+
+            <!-- Toggle button for mobile view -->
             <button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1">
                 <span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span>
             </button>
+
+            <!-- Navigation links -->
             <div class="collapse navbar-collapse" id="navcol-1">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="/contacts">Contact Us</a></li>
                 </ul>
+                <!-- Buttons to Sign up and Log in pages -->
                 <a class="btn btn-primary shadow" role="button" href="/signup">Sign up</a>
                 <a class="btn btn-primary" role="button" href="/login">Log in</a>
             </div>
         </div>
     </nav>
+
+    <!-- Main content section for sign-up form -->
     <section class="py-4 py-md-5 my-5">
         <div class="container py-md-5">
             <div class="row">
+                <!-- Illustration for sign-up -->
                 <div class="col-md-6 text-center">
                     <img class="img-fluid w-100" src="/static/assets/img/illustrations/register.svg" alt="Register Illustration">
                 </div>
+                <!-- Sign-up form -->
                 <div class="col-md-5 col-xl-4 text-center text-md-start">
                     <h2 class="display-6 fw-bold mb-5"><span class="underline pb-1"><strong>Sign up</strong></span></h2>
                     <form method="post" action="{{ url_for('signup') }}" data-bs-theme="light">
                         {{ form.hidden_tag() }}
+                        <!-- Username field -->
                         <div class="mb-3">
                             {{ form.username.label(class="form-label") }}
                             {{ form.username(class="shadow-sm form-control") }}
                         </div>
+                        <!-- Password field -->
                         <div class="mb-3">
                             {{ form.password.label(class="form-label") }}
                             {{ form.password(class="shadow-sm form-control") }}
                         </div>
+                        <!-- Submit button -->
                         <div class="mb-5">
                             {{ form.submit(class="btn btn-primary shadow") }}
                         </div>
                     </form>
+                    <!-- Link to Log in page for existing users -->
                     <p class="text-muted">Have an account? <a href="{{ url_for('login') }}">Log in&nbsp;
+                        <!-- Arrow icon for link -->
                         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icon-tabler-arrow-narrow-right">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                             <path d="M5 12h14"></path>
@@ -60,7 +79,8 @@
             </div>
         </div>
     </section>
-    <footer></footer>
+
+    <!-- Link to Bootstrap JavaScript file -->
     <script src="/static/assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="/static/assets/js/script.min.js"></script>
 </body>

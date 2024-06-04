@@ -1,48 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title> ADMIN - ASD4ME</title>
+    <!-- Set page title -->
+    <title>ADMIN - ASD4ME</title>
 </head>
 <body>
-    <!-- Navigation bar and other content -->
-
+    <!-- Section for Pending Study Guides -->
     <section class="py-5 mt-5">
         <div class="container py-5">
             <div class="row">
                 <div class="col-md-8 col-xl-6 text-center mx-auto">
+                    <!-- Heading -->
                     <h2 class="display-6 fw-bold mb-4">Pending Study Guides</h2>
+
+                    <!-- Check if there are pending study guides -->
                     {% if pending_guides %}
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col">Class</th>
-                                <th scope="col">Author</th>
-                                <th scope="col">Price</th>
-                                <th scope="col">Link</th>
-                                <th scope="col">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for guide in pending_guides %}
-                            <tr>
-                                <td>{{ guide.Class }}</td>
-                                <td>{{ guide.Creator }}</td>
-                                <td>{{ guide.Price }}</td>
-                                <td><a href="{{ guide.Link if guide.Link.startswith('http') else 'https://' + guide.Link }}">Link</a></td>
-                                <td>
-                                    <form method="post" action="{{ url_for('market_bp.admin_home') }}">
-                                        {{ form.csrf_token }}
-                                        <input type="hidden" name="guide_id" value="{{ guide.id }}">
-                                        <button class="btn btn-primary" type="submit" name="action" value="approve">Approve</button>
-                                        <button class="btn btn-danger" type="submit" name="action" value="reject">Reject</button>
-                                    </form>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                        <!-- Table for displaying pending study guides -->
+                        <table class="table">
+                            <!-- Table header -->
+                            <thead>
+                                <tr>
+                                    <!-- Column headers -->
+                                    <th scope="col">Class</th>
+                                    <th scope="col">Author</th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col">Link</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <!-- Table body -->
+                            <tbody>
+                                <!-- Loop through each pending guide -->
+                                {% for guide in pending_guides %}
+                                    <tr>
+                                        <!-- Display guide details -->
+                                        <td>{{ guide.Class }}</td>
+                                        <td>{{ guide.Creator }}</td>
+                                        <td>{{ guide.Price }}</td>
+                                        <!-- Link to guide -->
+                                        <td><a href="{{ guide.Link if guide.Link.startswith('http') else 'https://' + guide.Link }}">Link</a></td>
+                                        <td>
+                                            <!-- Form for approving/rejecting guide -->
+                                            <form method="post" action="{{ url_for('market_bp.admin_home') }}">
+                                                {{ form.csrf_token }}
+                                                <!-- Hidden field with guide ID -->
+                                                <input type="hidden" name="guide_id" value="{{ guide.id }}">
+                                                <!-- Approve button -->
+                                                <button class="btn btn-primary" type="submit" name="action" value="approve">Approve</button>
+                                                <!-- Reject button -->
+                                                <button class="btn btn-danger" type="submit" name="action" value="reject">Reject</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     {% else %}
-                    <p>No pending study guides.</p>
+                        <!-- Message if no pending study guides -->
+                        <p>No pending study guides.</p>
                     {% endif %}
                 </div>
             </div>

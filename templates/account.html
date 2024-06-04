@@ -1,52 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Set character encoding -->
     <meta charset="UTF-8">
+    <!-- Set viewport for responsive design -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Set page title -->
     <title>Account - ASD4ME</title>
+    <!-- Include Bootstrap CSS -->
     <link rel="stylesheet" href="/static/assets/bootstrap/css/bootstrap.min.css">
 </head>
+
 <body>
+    <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-md fixed-top navbar-shrink py-3 navbar-light" id="mainNav">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="/market"><span>ASD4ME</span></a>
-            <button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1">
+            <!-- Website Logo with link to market -->
+            <a class="navbar-brand d-flex align-items-center" href="/market">
+                <span>ASD4ME</span>
+            </a>
+            <!-- Navigation Menu Toggle Button -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navcol-1">
                 <span class="visually-hidden">Toggle navigation</span>
                 <span class="navbar-toggler-icon"></span>
             </button>
+            <!-- Collapsible Navigation Menu -->
             <div class="collapse navbar-collapse" id="navcol-1">
                 <ul class="navbar-nav mx-auto">
-                    <li class="nav-item"><a class="nav-link active" href="/market/search">Search</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/market/share">Share</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/market/account">My Cart</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/market/logout">Logout</a></li>
+                    <!-- Search Link -->
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/market/search">Search</a>
+                    </li>
+                    <!-- Share Link -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="/market/share">Share</a>
+                    </li>
+                    <!-- My Cart Link -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="/market/account">My Cart</a>
+                    </li>
+                    <!-- Logout Link -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="/market/logout">Logout</a>
+                    </li>
                 </ul>
+                <!-- Account Button -->
                 <a class="btn btn-primary shadow" role="button" href="/market/account">Account</a>
             </div>
         </div>
     </nav>
+
+    <!-- Account Section -->
     <section class="py-5 mt-5">
         <div class="container py-5">
             <div class="row">
                 <div class="col-md-8 col-xl-6 text-center mx-auto">
+                    <!-- Heading -->
                     <h2 class="display-6 fw-bold mb-4">Account Details</h2>
+                    <!-- Wallet Balance -->
                     <p><strong>Wallet Balance:</strong> ${{ wallet }}</p>
                 </div>
             </div>
             <div class="row d-flex justify-content-center">
                 <div class="col-md-8">
+                    <!-- Cart Heading -->
                     <h4 class="mb-4">Your Cart</h4>
                     {% if cart_items %}
                         <ul class="list-group">
                             {% for item in cart_items %}
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <div>
+                                        <!-- Class Name -->
                                         <h5>{{ item.study_guide.Class }}</h5>
+                                        <!-- Unit Topic -->
                                         <p>{{ item.study_guide.UnitTopic }}</p>
+                                        <!-- Creator Name -->
                                         <p><strong>Created by:</strong> {{ item.study_guide.Creator }}</p>
+                                        <!-- Price -->
                                         <p><strong>Price:</strong> ${{ item.study_guide.Price }}</p>
+                                        <!-- Quantity -->
                                         <p><strong>Quantity:</strong> {{ item.quantity }}</p>
                                     </div>
+                                    <!-- Remove Button Form -->
                                     <form action="{{ url_for('market_bp.account_home') }}" method="post">
                                         {{ form.hidden_tag() }}
                                         <input type="hidden" name="item_id" value="{{ item.id }}">
@@ -55,39 +90,50 @@
                                 </li>
                             {% endfor %}
                         </ul>
+                        <!-- Finalize Purchase Button Form -->
                         <form action="{{ url_for('market_bp.finalize_purchase') }}" method="post">
                             {{ form.hidden_tag() }}
                             <button class="btn btn-success mt-3" type="submit">Finalize Purchase</button>
                         </form>
                     {% else %}
+                        <!-- Empty Cart Message -->
                         <p class="text-muted">Your cart is empty.</p>
                     {% endif %}
                 </div>
             </div>
             <div class="row d-flex justify-content-center mt-5">
                 <div class="col-md-8">
+                    <!-- Inventory Heading -->
                     <h4 class="mb-4">Your Inventory</h4>
                     {% if inventory %}
                         <ul class="list-group">
                             {% for item in inventory %}
                                 <li class="list-group-item">
                                     <div>
+                                        <!-- Class Name -->
                                         <h5>{{ item.study_guide.Class }}</h5>
+                                        <!-- Unit Topic -->
                                         <p>{{ item.study_guide.UnitTopic }}</p>
+                                        <!-- Creator Name -->
                                         <p><strong>Created by:</strong> {{ item.study_guide.Creator }}</p>
+                                        <!-- Price -->
                                         <p><strong>Price:</strong> ${{ item.study_guide.Price }}</p>
+                                        <!-- Access Study Guide Button -->
                                         <a href="{{ item.study_guide.Link if item.study_guide.Link.startswith('http') else 'https://' + item.study_guide.Link }}" class="btn btn-primary">Access Study Guide</a>
                                     </div>
                                 </li>
                             {% endfor %}
                         </ul>
                     {% else %}
+                        <!-- Empty Inventory Message -->
                         <p class="text-muted">Your inventory is empty.</p>
                     {% endif %}
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- Include Bootstrap JavaScript -->
     <script src="/static/assets/bootstrap/js/bootstrap.min.js"></script>
 </body>
 </html>
