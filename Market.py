@@ -129,6 +129,8 @@ def share():
         db.session.add(new_pending_guide)
         # Commit the changes to the study guide
         db.session.commit()
+        # Redirect to the market home page after sharing
+        return redirect(url_for('market_bp.market_home'))
     # Render share.html for the users to successfully share
     return render_template('share.html', form=form, user=current_user)
 
@@ -140,10 +142,15 @@ def account_home():
     account_home is the user's account page, which displays account info such as wallet balance and cart. This function
     gives users the option to remove study guides, finalize their cart purchases, and view items in their inventory.
     """
+    # Initialize the form
+    form = FlaskForm()
     # Fetch current user's cart
     cart = current_user.cart
     # Query user's cart database to get all the items
-    cart_items = CartItem.query.filter_by(cart_id=cart.id).all() if cart else []
+    if cart:
+        cart_items = CartItem.query.filter_by(cart_id=cart.id).all()
+    else:
+        cart_items = []
     # Check for a request in account.html
     if request.method == 'POST':
         # Get the item_id from the form
@@ -163,8 +170,6 @@ def account_home():
 
     # Fetch all the user's inventory items from their inventory database
     inventory_items = Inventory.query.filter_by(user_id=current_user.id).all()
-    # Initialize the form
-    form = FlaskForm()
     # Render the account.html template (Setting wallet, cart_items, inventory_items, and the form to what is necessary)
     return render_template('account.html', wallet=current_user.wallet, cart_items=cart_items, inventory=inventory_items,
                            form=form)
@@ -255,11 +260,10 @@ def admin_home():
         elif action == 'reject':
             # Reject a pending study guide
             rejected_guide = PendingStudyGuide.query.get(guide_id)
-            if rejected_guide:
-                # Delete the rejected study guide from the database
-                db.session.delete(rejected_guide)
-                # Commit changes to the database
-                db.session.commit()
+            # Delete the rejected study guide from the database
+            db.session.delete(rejected_guide)
+            # Commit changes to the database
+            db.session.commit()
         # Redirect to the admin page
         return redirect(url_for('market_bp.admin_home'))
     # Retrieve all pending study guides
@@ -332,7 +336,7 @@ def results():
                         db.session.add(cart_item)
                     # Commit changes to the database
                     db.session.commit()
-    # Get the query from the URL
+    # Get the query from the form
     query = request.args.get('query')
     # Get the study guides from the database using the query
     if query:

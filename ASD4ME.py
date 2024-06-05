@@ -170,5 +170,5 @@ if __name__ == '__main__':
     # Create all the tables in the database
     with app.app_context():
         db.create_all()
-    # Run the app on the server
+        # Run the app on the server
     app.run(host='0.0.0.0', port=5000)
