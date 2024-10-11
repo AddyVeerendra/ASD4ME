@@ -14,13 +14,16 @@ functions:
 # os import to retrieve database path
 import os
 
-# General flask imports
-from flask import Flask, render_template, url_for, redirect
+
 from flask_login import login_user, login_required, logout_user
 from flask_wtf import CSRFProtect
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length
+import jwt
+from flask import Flask, jsonify, redirect, url_for, render_template, request
+from datetime import datetime, timedelta
+from functools import wraps
 
 # Import the market blueprint
 from Market import market_bp
@@ -66,6 +69,11 @@ login_manager.login_view = 'login'
 # Register the market blueprint with the app to gain access to market.py
 app.register_blueprint(market_bp, url_prefix='/market')
 
+# Secret key for JWT
+SECRET_KEY = 'Study4MoneyASD4ME'
+
+# Store active tokens
+active_tokens = {}
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -108,39 +116,48 @@ def home():
     # Render the index.html template
     return render_template('index.html')
 
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     """
     This function renders the login.html template, and allows users to log in to the website using forms.
     """
-    # Initialize LoginForm
     form = LoginForm()
-    # Check if the form is validated
     if form.validate_on_submit():
-        # Query the database for the user
         user = User.query.filter_by(username=form.username.data).first()
-        # Check if the user exists and the password is correct
         if user and bcrypt.check_password_hash(user.password, form.password.data):
-            # Log the user in, starting their session
-            login_user(user)
-            # Redirect to the market blueprint's home
-            return redirect(url_for('market_bp.market_home'))
-    # Render the login.html template
+            # Invalidate any previous session tokens
+            for token, uid in list(active_tokens.items()):
+                if uid == user.id:
+                    del active_tokens[token]
+
+            # Generate a JWT token
+            token = jwt.encode({
+                'user_id': user.id,
+                'exp': datetime.utcnow() + timedelta(hours=1)  # Token expires in 1 hour
+            }, SECRET_KEY, algorithm='HS256')
+
+            # Store the token in the active tokens store
+            active_tokens[token] = user.id
+
+            # Redirect to the market blueprint's home with the token in headers (or cookies)
+            response = redirect(url_for('market_bp.market_home'))
+            response.headers['Authorization'] = f'Bearer {token}'
+
+            return response
     return render_template('login.html', form=form)
 
 
 @app.route('/logout', methods=['GET', 'POST'])
-@login_required
+@token_required
 def logout():
     """
     This function logs the user out of the website, ending their session.
     """
-    # Log the user out, ending their session
-    logout_user()
-    # Redirect to the login page
-    return redirect(url_for('login'))
-
+    token = request.headers.get('Authorization').split()[1]  # Extract the token
+    if token in active_tokens:
+        del active_tokens[token]  # Remove the token
+        return jsonify(message='Logged out successfully')
+    return jsonify(message='Invalid token'), 401
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():

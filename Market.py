@@ -27,7 +27,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, IntegerField
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired, Length, NumberRange
-
+from ASD4ME import token_required
 # Database imports
 from extensions import db
 # Model imports
@@ -91,7 +91,7 @@ class SearchForm(FlaskForm):
 
 
 @market_bp.route('/')
-@login_required
+@token_required
 def market_home():
     """
     Home page of the market application. Displays basic user info such as wallet balance, and allows navigation to other
@@ -106,7 +106,7 @@ def market_home():
 
 
 @market_bp.route('/share', methods=['GET', 'POST'])
-@login_required
+@token_required
 def share():
     """
     Page for users to share study guides. Users enter the necessary information to share a study guide in share.html
@@ -136,7 +136,7 @@ def share():
 
 
 @market_bp.route('/account', methods=['GET', 'POST'])
-@login_required
+@token_required
 def account_home():
     """
     account_home is the user's account page, which displays account info such as wallet balance and cart. This function
@@ -176,7 +176,7 @@ def account_home():
 
 
 @market_bp.route('/finalize_purchase', methods=['POST'])
-@login_required
+@token_required
 def finalize_purchase():
     """
     finalize_purchase allows users to finish adding the items in their cart to their inventory, and accordingly checks
@@ -223,7 +223,7 @@ def finalize_purchase():
 
 
 @market_bp.route('/admin', methods=['GET', 'POST'])
-@login_required
+@token_required
 def admin_home():
     """
     Admin home page. Displays pending study guides and allows admin to approve or reject them.
@@ -273,7 +273,7 @@ def admin_home():
 
 
 @market_bp.route('/search', methods=['GET', 'POST'])
-@login_required
+@token_required
 def search():
     """
     Page for users to search study guides. Users enter a string in searchbar.html and the string is retrieved and stored
@@ -291,7 +291,7 @@ def search():
 
 
 @market_bp.route('/search/results', methods=['GET', 'POST'])
-@login_required
+@token_required
 def results():
     """
     results allows users to view the results of their search query, and add study guides to their cart
