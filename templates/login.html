@@ -54,7 +54,7 @@
                         <span class="underline pb-1"><strong>Login</strong></span>
                     </h2>
                     <!-- Login form -->
-                    <form method="post" action="{{ url_for('login') }}" data-bs-theme="light">
+                    <form method="post" action="{{ url_for('login') }}" data-bs-theme="light" id="loginForm">
                         <!-- Hidden form fields -->
                         {{ form.hidden_tag() }}
                         <!-- Username field -->
@@ -81,6 +81,73 @@
     <script src="/static/assets/bootstrap/js/bootstrap.min.js"></script>
     <!-- Include additional scripts -->
     <script src="/static/assets/js/script.min.js"></script>
+
+<!-- Include jQuery (or use native JS fetch) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Existing jQuery (or use native JS fetch) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    // Handle login form submission
+    $('#loginForm').on('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        // Get the CSRF token from the form
+        const csrf_token = $('input[name="csrf_token"]').val();  // Extract CSRF token
+
+        // Collect form data as JSON
+        const formData = {
+            username: $('#username').val(),
+            password: $('#password').val(),
+        };
+
+        $.ajax({
+            type: 'POST',
+            url: '/login',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),  // Convert form data to JSON
+            headers: {
+                'X-CSRFToken': csrf_token // Add the CSRF token to the request header
+            },
+            success: function(response) {
+                // Store the JWT token on successful login
+                if (response.success) {
+                    localStorage.setItem('access_token', response.access_token); // Store JWT
+                    window.location.href = '/market'; // Redirect to market page
+                } else {
+                    alert('Login failed: ' + response.message); // Handle unsuccessful login
+                }
+            },
+            error: function(xhr) {
+                alert('Login failed: ' + xhr.responseText); // Handle error
+            }
+        });
+    });
+
+    // Handle signup form submission
+    $('#signupForm').on('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+        $.ajax({
+            type: 'POST',
+            url: '/signup',
+            data: $(this).serialize(),
+            success: function(response) {
+                window.location.href = '/login'; // Redirect to login after signup
+            },
+            error: function(xhr) {
+                alert('Signup failed: ' + xhr.responseText); // Handle error
+            }
+        });
+    });
+});
+</script>
+
+
+
 </body>
 
 </html>

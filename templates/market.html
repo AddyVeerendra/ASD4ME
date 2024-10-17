@@ -95,6 +95,22 @@
 
     <!-- Link to custom JavaScript file -->
     <script src="/static/assets/js/script.min.js"></script>
+
+    <!-- Include jQuery (or use native JS fetch) -->
+<script>
+    const token = localStorage.getItem('access_token');
+    $.ajax({
+        type: 'GET',
+        url: '/market',
+        headers: { 'Authorization': 'Bearer ' + token },
+        success: function(response) {
+            // Handle the response
+        },
+        error: function(xhr) {
+            alert('Error fetching data: ' + xhr.responseText);
+        }
+    });
+</script>
 </body>
 
 </html>

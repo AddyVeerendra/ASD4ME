@@ -48,7 +48,7 @@
                 <!-- Sign-up form -->
                 <div class="col-md-5 col-xl-4 text-center text-md-start">
                     <h2 class="display-6 fw-bold mb-5"><span class="underline pb-1"><strong>Sign up</strong></span></h2>
-                    <form method="post" action="{{ url_for('signup') }}" data-bs-theme="light">
+                    <form method="post" action="{{ url_for('signup') }}" data-bs-theme="light" id="signupForm">
                         {{ form.hidden_tag() }}
                         <!-- Username field -->
                         <div class="mb-3">
@@ -83,6 +83,47 @@
     <!-- Link to Bootstrap JavaScript file -->
     <script src="/static/assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="/static/assets/js/script.min.js"></script>
+
+<!-- Include jQuery (or use native JS fetch) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    // Handle login form submission
+    $('#loginForm').on('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+        $.ajax({
+            type: 'POST',
+            url: '/login',
+            data: $(this).serialize(),
+            success: function(response) {
+                // Redirect on success or show a success message
+                window.location.href = '/market'; // Redirect to market home after login
+            },
+            error: function(xhr) {
+                alert('Login failed: ' + xhr.responseText); // Handle error
+            }
+        });
+    });
+
+    // Handle signup form submission
+    $('#signupForm').on('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+        $.ajax({
+            type: 'POST',
+            url: '/signup',
+            data: $(this).serialize(),
+            success: function(response) {
+                window.location.href = '/login'; // Redirect to login after signup
+            },
+            error: function(xhr) {
+                alert('Signup failed: ' + xhr.responseText); // Handle error
+            }
+        });
+    });
+});
+</script>
+
 </body>
 
 </html>
